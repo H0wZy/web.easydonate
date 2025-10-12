@@ -10,9 +10,9 @@ namespace Auth.Api.Controllers
     public class UserController(IUserRepository userInterface) : ControllerBase
     {
         [HttpGet("GetAllAsync")]
-        public async Task<ActionResult<ApiResponse<List<UserModel>>>> GetAllAsync()
+        public async Task<ActionResult<ApiResponse<List<UserModel>>>> GetAllUsersAsync()
         {
-            var users = await userInterface.GetAllAsync();
+            var users = await userInterface.GetAllUsersAsync();
             return Ok(users);
         }
     }

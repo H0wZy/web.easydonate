@@ -5,7 +5,7 @@ namespace Auth.Api.Data;
 
 public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options)
 {
-    public DbSet<UserModel> Users { get; set; }
+    public DbSet<UserModel> Users { get; set; } = null!;
     public DbSet<DonorModel> Donors { get; set; }
     public DbSet<OrganizationModel> Organizations { get; set; }
 
