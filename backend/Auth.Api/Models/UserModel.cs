@@ -13,6 +13,14 @@ public class UserModel
     [StringLength(255)]
     public string? Username { get; set; }
 
+    [Column("FirstName")]
+    [StringLength(255)]
+    public required string FirstName { get; set; }
+
+    [Column("LastName")]
+    [StringLength(255)]
+    public required string LastName { get; set; }
+
     [Column("Email")] [StringLength(255)] public string Email { get; set; } = string.Empty;
 
     [Column("Password")]
