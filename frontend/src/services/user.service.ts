@@ -1,6 +1,6 @@
 import api from "./api";
 
-import type { User } from "../models/userModel";
+import type { User } from "../models/user.model";
 
 export const userService = {
   getAll: async (): Promise<User[]> => {

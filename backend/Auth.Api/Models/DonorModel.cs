@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Auth.Api.Model;
+namespace Auth.Api.Models;
 
 [Table("donor")]
 public class DonorModel

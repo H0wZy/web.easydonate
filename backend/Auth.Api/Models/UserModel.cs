@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Auth.Api.Enum;
 
-namespace Auth.Api.Model;
+namespace Auth.Api.Models;
 
 [Table("user")]
 public class UserModel
