@@ -1,13 +1,21 @@
 using User.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using User.Api.Repositories.UserRepository;
+using User.Api.Services.UserService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddOpenApi();
+// builder.Services.AddSwaggerGen();
+
+// Repositórios e Serviços
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -20,19 +28,26 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "User.Api v1");
-        c.RoutePrefix = string.Empty;
+        options.Title = "User.Api";
+        options.Theme = ScalarTheme.Default;
+        options.DefaultHttpClient = new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
+
+    // app.UseSwagger();
+    // app.UseSwaggerUI(c =>
+    // {
+    //     c.SwaggerEndpoint("/swagger/v1/swagger.json", "User.Api v1");
+    //     c.RoutePrefix = string.Empty;
+    // });
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

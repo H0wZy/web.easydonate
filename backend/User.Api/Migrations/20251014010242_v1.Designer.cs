@@ -12,21 +12,21 @@ using User.Api.Data;
 namespace User.Api.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20251011025123_Initial")]
-    partial class Initial
+    [Migration("20251014010242_v1")]
+    partial class v1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("auth")
+                .HasDefaultSchema("user")
                 .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("User.Api.Model.DonorModel", b =>
+            modelBuilder.Entity("User.Api.Models.DonorModel", b =>
                 {
                     b.Property<int>("DonorId")
                         .ValueGeneratedOnAdd()
@@ -57,13 +57,13 @@ namespace User.Api.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("FirstName");
+                        .HasColumnName("Firstname");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
-                        .HasColumnName("LastName");
+                        .HasColumnName("Lastname");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
@@ -92,10 +92,10 @@ namespace User.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("donor", "auth");
+                    b.ToTable("donor", "user");
                 });
 
-            modelBuilder.Entity("User.Api.Model.OrganizationModel", b =>
+            modelBuilder.Entity("User.Api.Models.OrganizationModel", b =>
                 {
                     b.Property<int>("OrganizationId")
                         .ValueGeneratedOnAdd()
@@ -170,10 +170,10 @@ namespace User.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("organization", "auth");
+                    b.ToTable("organization", "user");
                 });
 
-            modelBuilder.Entity("User.Api.Model.UserModel", b =>
+            modelBuilder.Entity("User.Api.Models.UserModel", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -191,6 +191,18 @@ namespace User.Api.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("Email");
+
+                    b.Property<string>("Firstname")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("Firstname");
+
+                    b.Property<string>("Lastname")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("Lastname");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("timestamp with time zone")
@@ -217,12 +229,12 @@ namespace User.Api.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("user", "auth");
+                    b.ToTable("user", "user");
                 });
 
-            modelBuilder.Entity("User.Api.Model.DonorModel", b =>
+            modelBuilder.Entity("User.Api.Models.DonorModel", b =>
                 {
-                    b.HasOne("User.Api.Model.UserModel", "User")
+                    b.HasOne("User.Api.Models.UserModel", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -231,9 +243,9 @@ namespace User.Api.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("User.Api.Model.OrganizationModel", b =>
+            modelBuilder.Entity("User.Api.Models.OrganizationModel", b =>
                 {
-                    b.HasOne("User.Api.Model.UserModel", "User")
+                    b.HasOne("User.Api.Models.UserModel", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
