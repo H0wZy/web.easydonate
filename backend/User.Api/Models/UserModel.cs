@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Auth.Api.Enum;
+using User.Api.Enum;
 
-namespace Auth.Api.Models;
+namespace User.Api.Models;
 
 [Table("user")]
 public class UserModel
@@ -13,13 +13,13 @@ public class UserModel
     [StringLength(255)]
     public string? Username { get; set; }
 
-    [Column("FirstName")]
+    [Column("Firstname")]
     [StringLength(255)]
-    public required string FirstName { get; set; }
+    public required string Firstname { get; set; }
 
-    [Column("LastName")]
+    [Column("Lastname")]
     [StringLength(255)]
-    public required string LastName { get; set; }
+    public required string Lastname { get; set; }
 
     [Column("Email")] [StringLength(255)] public string Email { get; set; } = string.Empty;
 

@@ -1,9 +1,9 @@
-﻿using Auth.Api.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using User.Api.Models;
 
-namespace Auth.Api.Data;
+namespace User.Api.Data;
 
-public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(options)
+public class UserDbContext(DbContextOptions<UserDbContext> options) : DbContext(options)
 {
     public DbSet<UserModel> Users { get; set; } = null!;
     public DbSet<DonorModel> Donors { get; set; }
@@ -11,7 +11,7 @@ public class AuthDbContext(DbContextOptions<AuthDbContext> options) : DbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("auth");
+        modelBuilder.HasDefaultSchema("user");
 
         modelBuilder.Entity<DonorModel>()
             .HasOne(d => d.User)

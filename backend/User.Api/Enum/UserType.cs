@@ -1,4 +1,4 @@
-﻿namespace Auth.Api.Enum;
+﻿namespace User.Api.Enum;
 
 public enum UserType
 {

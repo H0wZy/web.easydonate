@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
-using Auth.Api.Data;
-using Auth.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using User.Api.Data;
+using User.Api.Models;
 
-namespace Auth.Api.Repositories.UserRepository;
+namespace User.Api.Repositories.UserRepository;
 
-public class UserRepository(AuthDbContext context) : IUserRepository
+public class UserRepository(UserDbContext context) : IUserRepository
 {
     public async Task<List<UserModel>> GetAllUsersAsync()
     {
@@ -22,21 +22,21 @@ public class UserRepository(AuthDbContext context) : IUserRepository
         return await context.Users.FirstOrDefaultAsync(predicate);
     }
 
-    public async Task<UserModel?> CreateUserAsync(UserModel? user)
+    public async Task<UserModel> CreateUserAsync(UserModel user)
     {
         await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
         return user;
     }
 
-    public async Task<UserModel?> UpdateUserAsync(UserModel? user)
+    public async Task<UserModel> UpdateUserAsync(UserModel user)
     {
         context.Users.Update(user);
         await context.SaveChangesAsync();
         return user;
     }
 
-    public async Task<UserModel?> DeleteUserAsync(UserModel? user)
+    public async Task<UserModel> DeleteUserAsync(UserModel user)
     {
         context.Users.Remove(user);
         await context.SaveChangesAsync();

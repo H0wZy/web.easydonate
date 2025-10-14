@@ -1,17 +1,16 @@
 ﻿using System.Linq.Expressions;
-using Auth.Api.Data;
-using Auth.Api.Dto;
-using Auth.Api.Models;
-using Auth.Api.Models.Response;
 using Microsoft.EntityFrameworkCore;
+using User.Api.Data;
+using User.Api.Dto;
+using User.Api.Models;
 
-namespace Auth.Api.Repositories.UserRepository;
+namespace User.Api.Repositories.UserRepository;
 
-public class Util(AuthDbContext context) : IUserRepository
+public class Util(UserDbContext context) : IUserRepository
 {
-    public async Task<ApiResponse<UserModel>> GetByIdAsync(int id)
+    public async Task<RespondeModel<UserModel>> GetByIdAsync(int id)
     {
-        ApiResponse<UserModel> response = new();
+        RespondeModel<UserModel> response = new();
         try
         {
             var user = await context.Users.FirstOrDefaultAsync(user => user.UserId == id);
@@ -36,9 +35,9 @@ public class Util(AuthDbContext context) : IUserRepository
         return response;
     }
 
-    public async Task<ApiResponse<List<UserModel?>>> GetAllAsync()
+    public async Task<RespondeModel<List<UserModel?>>> GetAllAsync()
     {
-        ApiResponse<List<UserModel?>> response = new();
+        RespondeModel<List<UserModel?>> response = new();
 
         try
         {
@@ -58,9 +57,9 @@ public class Util(AuthDbContext context) : IUserRepository
         return response;
     }
 
-    public async Task<ApiResponse<List<UserModel?>>> CreateUserAsync(CreateUserDto createUserDto)
+    public async Task<RespondeModel<List<UserModel?>>> CreateUserAsync(CreateUserDto createUserDto)
     {
-        ApiResponse<List<UserModel?>> response = new();
+        RespondeModel<List<UserModel?>> response = new();
 
         try
         {
@@ -68,8 +67,8 @@ public class Util(AuthDbContext context) : IUserRepository
             {
                 Username = createUserDto.Username,
                 Email = createUserDto.Email,
-                FirstName = createUserDto.FirstName,
-                LastName = createUserDto.LastName,
+                Firstname = createUserDto.FirstName,
+                Lastname = createUserDto.LastName,
                 Password = createUserDto.Password,
                 UserType = createUserDto.UserType
             };
@@ -91,9 +90,9 @@ public class Util(AuthDbContext context) : IUserRepository
         return response;
     }
 
-    public async Task<ApiResponse<List<UserModel?>>> UpdateUserAsync(UpdateUserDto updateUserDto)
+    public async Task<RespondeModel<List<UserModel?>>> UpdateUserAsync(UpdateUserDto updateUserDto)
     {
-        ApiResponse<List<UserModel?>> response = new();
+        RespondeModel<List<UserModel?>> response = new();
         try
         {
             var user = await context.Users.FirstOrDefaultAsync(user => user.UserId == updateUserDto.UserId);
@@ -107,8 +106,8 @@ public class Util(AuthDbContext context) : IUserRepository
 
             user.Username = updateUserDto.Username;
             user.Email = updateUserDto.Email;
-            user.FirstName = updateUserDto.FirstName;
-            user.LastName = updateUserDto.LastName;
+            user.Firstname = updateUserDto.FirstName;
+            user.Lastname = updateUserDto.LastName;
 
             context.Update(user);
             await context.SaveChangesAsync();
@@ -127,9 +126,9 @@ public class Util(AuthDbContext context) : IUserRepository
         return response;
     }
 
-    public async Task<ApiResponse<List<UserModel?>>> DeleteUserAsync(int id)
+    public async Task<RespondeModel<List<UserModel?>>> DeleteUserAsync(int id)
     {
-        ApiResponse<List<UserModel?>> response = new();
+        RespondeModel<List<UserModel?>> response = new();
 
         try
         {

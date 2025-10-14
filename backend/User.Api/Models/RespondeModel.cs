@@ -1,6 +1,6 @@
-﻿namespace Auth.Api.Models.Response;
+﻿namespace User.Api.Models;
 
-public class ApiResponse<T>
+public class RespondeModel<T>
 {
     public T? Data { get; set; }
     public bool Success { get; set; }

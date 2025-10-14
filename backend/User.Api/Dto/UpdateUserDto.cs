@@ -1,6 +1,6 @@
-﻿using Auth.Api.Enum;
+﻿using User.Api.Enum;
 
-namespace Auth.Api.Dto;
+namespace User.Api.Dto;
 
 public record UpdateUserDto(
     int UserId,

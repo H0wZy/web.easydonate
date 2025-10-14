@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Auth.Api.Models;
+namespace User.Api.Models;
 
 [Table("donor")]
 public class DonorModel
@@ -13,11 +13,11 @@ public class DonorModel
     [Column("UserId")]
     public int UserId { get; set; }
 
-    [Column("FirstName")]
+    [Column("Firstname")]
     [StringLength(100)]
     public string FirstName { get; set; } = string.Empty;
 
-    [Column("LastName")]
+    [Column("Lastname")]
     [StringLength(100)]
     public string LastName { get; set; } = string.Empty;
 
