@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace User.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class v1 : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,21 +20,25 @@ namespace User.Api.Migrations
                 schema: "user",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Username = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Firstname = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Lastname = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Password = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
+                    ConfirmPassword = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
                     UserType = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    TermsConsentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastLoginAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    TermsConsentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsUserDisabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AcceptedTerms = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_user", x => x.UserId);
+                    table.PrimaryKey("PK_user", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -44,7 +48,7 @@ namespace User.Api.Migrations
                 {
                     DonorId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false),
                     Firstname = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Lastname = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     BirthDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -54,17 +58,18 @@ namespace User.Api.Migrations
                     State = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     ZipCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Id1 = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_donor", x => x.DonorId);
                     table.ForeignKey(
-                        name: "FK_donor_user_UserId",
-                        column: x => x.UserId,
+                        name: "FK_donor_user_Id",
+                        column: x => x.Id,
                         principalSchema: "user",
                         principalTable: "user",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -75,7 +80,7 @@ namespace User.Api.Migrations
                 {
                     OrganizationId = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false),
                     OrganizationName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     CNPJ = table.Column<string>(type: "character varying(18)", maxLength: 18, nullable: true),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
@@ -87,31 +92,32 @@ namespace User.Api.Migrations
                     ZipCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     IsVerified = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    ModifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Id1 = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_organization", x => x.OrganizationId);
                     table.ForeignKey(
-                        name: "FK_organization_user_UserId",
-                        column: x => x.UserId,
+                        name: "FK_organization_user_Id",
+                        column: x => x.Id,
                         principalSchema: "user",
                         principalTable: "user",
-                        principalColumn: "UserId",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_donor_UserId",
+                name: "IX_donor_Id",
                 schema: "user",
                 table: "donor",
-                column: "UserId");
+                column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_organization_UserId",
+                name: "IX_organization_Id",
                 schema: "user",
                 table: "organization",
-                column: "UserId");
+                column: "Id");
         }
 
         /// <inheritdoc />

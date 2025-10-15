@@ -56,6 +56,9 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("Firstname");
 
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -78,7 +81,7 @@ namespace User.Api.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
-                        .HasColumnName("UserId");
+                        .HasColumnName("Id");
 
                     b.Property<string>("ZipCode")
                         .HasMaxLength(20)
@@ -89,7 +92,11 @@ namespace User.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("donor", "user");
+                    b.ToTable("donor", "user", t =>
+                        {
+                            t.Property("Id")
+                                .HasColumnName("Id1");
+                        });
                 });
 
             modelBuilder.Entity("User.Api.Models.OrganizationModel", b =>
@@ -125,6 +132,9 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(1000)")
                         .HasColumnName("Description");
 
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsVerified")
                         .HasColumnType("boolean")
                         .HasColumnName("IsVerified");
@@ -151,7 +161,7 @@ namespace User.Api.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer")
-                        .HasColumnName("UserId");
+                        .HasColumnName("Id");
 
                     b.Property<string>("Website")
                         .HasMaxLength(255)
@@ -167,17 +177,31 @@ namespace User.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("organization", "user");
+                    b.ToTable("organization", "user", t =>
+                        {
+                            t.Property("Id")
+                                .HasColumnName("Id1");
+                        });
                 });
 
             modelBuilder.Entity("User.Api.Models.UserModel", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("UserId");
+                        .HasColumnName("Id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AcceptedTerms")
+                        .HasColumnType("boolean")
+                        .HasColumnName("AcceptedTerms");
+
+                    b.Property<string>("ConfirmPassword")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)")
+                        .HasColumnName("ConfirmPassword");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -195,15 +219,19 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("Firstname");
 
+                    b.Property<bool>("IsUserDisabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("IsUserDisabled");
+
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("LastLoginAt");
+
                     b.Property<string>("Lastname")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("Lastname");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("ModifiedAt");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -215,6 +243,10 @@ namespace User.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("TermsConsentDate");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("UpdatedAt");
+
                     b.Property<int>("UserType")
                         .HasColumnType("integer")
                         .HasColumnName("UserType");
@@ -224,7 +256,7 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("Username");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("user", "user");
                 });

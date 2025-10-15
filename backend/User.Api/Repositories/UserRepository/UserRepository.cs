@@ -14,7 +14,7 @@ public class UserRepository(UserDbContext context) : IUserRepository
 
     public async Task<UserModel?> GetUserByIdAsync(int id)
     {
-        return await context.Users.FirstOrDefaultAsync(u => u.UserId == id);
+        return await context.Users.FirstOrDefaultAsync(u => u.Id == id);
     }
 
     public async Task<UserModel?> GetUserAsync(Expression<Func<UserModel?, bool>> predicate)

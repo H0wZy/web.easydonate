@@ -10,7 +10,7 @@ public class DonorModel
     [Column("DonorId")]
     public int DonorId { get; set; }
 
-    [Column("UserId")]
+    [Column("Id")]
     public int UserId { get; set; }
 
     [Column("Firstname")]
@@ -51,6 +51,6 @@ public class DonorModel
     public DateTime? ModifiedAt { get; set; }
 
     // Relacionamentos
-    [ForeignKey("UserId")]
+    [ForeignKey("Id")]
     public virtual UserModel User { get; set; } = null!;
 }

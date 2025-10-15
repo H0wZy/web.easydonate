@@ -1,8 +1,14 @@
 ﻿namespace User.Api.Models;
 
-public class RespondeModel<T>
+public record ResponseModel<T>(
+    bool Success,
+    string Message,
+    T? Data = default
+)
 {
-    public T? Data { get; set; }
-    public bool Success { get; set; }
-    public string Message { get; set; } = string.Empty;
+    public static ResponseModel<T> Ok(T data, string message = "Operação realizada com sucesso.")
+        => new(true, message, data);
+
+    public static ResponseModel<T> Fail(string message)
+        => new(false, message, default);
 }

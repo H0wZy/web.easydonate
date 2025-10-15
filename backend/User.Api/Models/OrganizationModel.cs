@@ -10,7 +10,7 @@ public class OrganizationModel
     [Column("OrganizationId")]
     public int OrganizationId { get; set; }
 
-    [Column("UserId")]
+    [Column("Id")]
     public int UserId { get; set; }
 
     [Column("OrganizationName")]
@@ -59,6 +59,6 @@ public class OrganizationModel
     public DateTime? ModifiedAt { get; set; }
 
     // Relacionamentos
-    [ForeignKey("UserId")]
+    [ForeignKey("Id")]
     public virtual UserModel User { get; set; } = null!;
 }

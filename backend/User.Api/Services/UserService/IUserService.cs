@@ -1,8 +1,15 @@
-﻿using User.Api.Models;
+﻿using System.Linq.Expressions;
+using User.Api.Dto;
+using User.Api.Models;
 
 namespace User.Api.Services.UserService;
 
 public interface IUserService
 {
-    public Task<RespondeModel<List<UserModel>>> GetAllUsersAsync();
+    public Task<ResponseModel<List<UserModel>>> GetAllUsersAsync();
+    public Task<ResponseModel<UserModel>> GetUserByIdAsync(int id);
+    public Task<ResponseModel<UserModel>> GetUserAsync(Expression<Func<UserModel?, bool>> predicate);
+    public Task<ResponseModel<UserModel>> CreateUserAsync(CreateUserDto dto);
+    public Task<ResponseModel<UserModel>> UpdateUserAsync(UpdateUserDto dto);
+    public Task<ResponseModel<UserModel>> DeleteUserAsync(int id);
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using User.Api.Dto;
 using User.Api.Models;
 using User.Api.Repositories.UserRepository;
 using User.Api.Services.UserService;
@@ -10,9 +11,16 @@ namespace User.Api.Controllers
     public class UserController(IUserService userService) : ControllerBase
     {
         [HttpGet("GetAllUsersAsync")]
-        public async Task<ActionResult<RespondeModel<List<UserModel>>>> GetAllUsersAsync()
+        public async Task<ActionResult<ResponseModel<List<UserModel>>>> GetAllUsersAsync()
         {
             var response = await userService.GetAllUsersAsync();
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+        [HttpPost("CreateUserAsync")]
+        public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDto dto)
+        {
+            var response = await userService.CreateUserAsync(dto);
             return response.Success ? Ok(response) : BadRequest(response);
         }
     }
