@@ -8,7 +8,7 @@ public interface IUserRepository
 {
     Task<List<UserModel>> GetAllUsersAsync();
     Task<UserModel?> GetUserByIdAsync(int id);
-    Task<UserModel?> GetUserAsync(Expression<Func<UserModel?, bool>> predicate);
+    Task<UserModel?> GetUserAsync(Expression<Func<UserModel, bool>> predicate);
     Task<UserModel> CreateUserAsync(UserModel user);
     Task<UserModel> UpdateUserAsync(UserModel user);
     Task<UserModel> DeleteUserAsync(UserModel user);

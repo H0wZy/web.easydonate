@@ -11,9 +11,9 @@ public class UserModel
 
     [Column("Username")]
     [StringLength(255)]
-    public string? Username { get; set; }
+    public required string Username { get; set; }
 
-    [Column("Email")] [StringLength(255)] public string Email { get; set; } = string.Empty;
+    [Column("Email")] [StringLength(255)] public required string Email { get; set; }
 
     [Column("Firstname")]
     [StringLength(255)]
@@ -25,13 +25,9 @@ public class UserModel
 
     [Column("Password")]
     [StringLength(60)] // BCrypt sempre gera 60 caracteres
-    public string Password { get; set; } = string.Empty;
-    
-    [Column("ConfirmPassword")]
-    [StringLength(60)] // BCrypt sempre gera 60 caracteres
-    public string ConfirmPassword { get; set; } = string.Empty;
+    public required string Password { get; set; } = string.Empty;
 
-    [Column("UserType")] public UserType UserType { get; set; } // "Doador", "Ong", "ADM"
+    [Column("UserType")] public required UserType UserType { get; set; } // "Doador", "Ong", "ADM"
 
     [Column("CreatedAt")] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -42,9 +38,8 @@ public class UserModel
     [Column("TermsConsentDate")] public DateTime? TermsConsentDate { get; set; }
 
     [Column("IsUserDisabled")] public bool IsUserDisabled { get; set; } = false;
-    
-    [Column("AcceptedTerms")] public bool AcceptedTerms { get; set; }
 
+    [Column("AcceptedTerms")] public bool AcceptedTerms { get; set; }
 
     // Relacionamentos
     // public virtual Doador? Doador { get; set; }

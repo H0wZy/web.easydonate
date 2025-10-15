@@ -67,8 +67,8 @@
 //             {
 //                 Username = createUserDto.Username,
 //                 Email = createUserDto.Email,
-//                 Firstname = createUserDto.FirstName,
-//                 Lastname = createUserDto.LastName,
+//                 Firstname = createUserDto.Firstname,
+//                 Lastname = createUserDto.Lastname,
 //                 Password = createUserDto.Password,
 //                 UserType = createUserDto.UserType
 //             };
@@ -106,8 +106,8 @@
 //
 //             user.Username = updateUserDto.Username;
 //             user.Email = updateUserDto.Email;
-//             user.Firstname = updateUserDto.FirstName;
-//             user.Lastname = updateUserDto.LastName;
+//             user.Firstname = updateUserDto.Firstname;
+//             user.Lastname = updateUserDto.Lastname;
 //
 //             context.Update(user);
 //             await context.SaveChangesAsync();

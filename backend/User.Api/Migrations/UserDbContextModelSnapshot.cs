@@ -50,7 +50,7 @@ namespace User.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("CreatedAt");
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("Firstname")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
@@ -59,7 +59,7 @@ namespace User.Api.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("integer");
 
-                    b.Property<string>("LastName")
+                    b.Property<string>("Lastname")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
@@ -79,7 +79,7 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("State");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .HasColumnType("integer")
                         .HasColumnName("Id");
 
@@ -90,7 +90,7 @@ namespace User.Api.Migrations
 
                     b.HasKey("DonorId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Id");
 
                     b.ToTable("donor", "user", t =>
                         {
@@ -159,7 +159,7 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("State");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .HasColumnType("integer")
                         .HasColumnName("Id");
 
@@ -175,7 +175,7 @@ namespace User.Api.Migrations
 
                     b.HasKey("OrganizationId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Id");
 
                     b.ToTable("organization", "user", t =>
                         {
@@ -265,7 +265,7 @@ namespace User.Api.Migrations
                 {
                     b.HasOne("User.Api.Models.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -276,7 +276,7 @@ namespace User.Api.Migrations
                 {
                     b.HasOne("User.Api.Models.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

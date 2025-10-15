@@ -3,8 +3,8 @@
 namespace User.Api.Dto;
 
 public record UpdateUserDto(
-    int UserId,
+    int Id,
     string Username,
     string Email,
-    string FirstName,
-    string LastName);
+    string Firstname,
+    string Lastname);

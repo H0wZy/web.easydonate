@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using User.Api.Dto;
 using User.Api.Models;
-using User.Api.Repositories.UserRepository;
 using User.Api.Services.UserService;
 
 namespace User.Api.Controllers
@@ -17,10 +16,24 @@ namespace User.Api.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
+        [HttpGet("GetUserByIdAsync")]
+        public async Task<ActionResult<ResponseModel<UserModel>>> GetUserByIdAsync(int id)
+        {
+            var response = await userService.GetUserByIdAsync(id);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
         [HttpPost("CreateUserAsync")]
         public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDto dto)
         {
             var response = await userService.CreateUserAsync(dto);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+        
+        [HttpDelete("DeleteUserAsync")]
+        public async Task<IActionResult> DeleteUserAsync(int id)
+        {
+            var response = await userService.DeleteUserAsync(id);
             return response.Success ? Ok(response) : BadRequest(response);
         }
     }

@@ -8,7 +8,6 @@ public interface IUserService
 {
     public Task<ResponseModel<List<UserModel>>> GetAllUsersAsync();
     public Task<ResponseModel<UserModel>> GetUserByIdAsync(int id);
-    public Task<ResponseModel<UserModel>> GetUserAsync(Expression<Func<UserModel?, bool>> predicate);
     public Task<ResponseModel<UserModel>> CreateUserAsync(CreateUserDto dto);
     public Task<ResponseModel<UserModel>> UpdateUserAsync(UpdateUserDto dto);
     public Task<ResponseModel<UserModel>> DeleteUserAsync(int id);

@@ -14,7 +14,9 @@ public class UserService(IUserRepository userRepository) : IUserService
             var users = await userRepository.GetAllUsersAsync();
 
             return ResponseModel<List<UserModel>>.Ok(users,
-                users.Count == 0 ? "Nenhum usuário encontrado." : $"{users.Count} usuário(s) encontrado(s) com sucesso.");
+                users.Count == 0
+                    ? "Nenhum usuário encontrado."
+                    : $"{users.Count} usuário(s) encontrado(s) com sucesso.");
         }
         catch (Exception ex)
         {
@@ -23,14 +25,21 @@ public class UserService(IUserRepository userRepository) : IUserService
         }
     }
 
-    public Task<ResponseModel<UserModel>> GetUserByIdAsync(int id)
+    public async Task<ResponseModel<UserModel>> GetUserByIdAsync(int id)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var user = await userRepository.GetUserByIdAsync(id);
 
-    public Task<ResponseModel<UserModel>> GetUserAsync(Expression<Func<UserModel?, bool>> predicate)
-    {
-        throw new NotImplementedException();
+            return user is null
+                ? ResponseModel<UserModel>.Fail($"Nenhum usuário encontrado com o ID {id}.")
+                : ResponseModel<UserModel>.Ok(user, "Usuário encontrado com sucesso.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}.");
+        }
     }
 
     public async Task<ResponseModel<UserModel>> CreateUserAsync(CreateUserDto dto)
@@ -56,7 +65,6 @@ public class UserService(IUserRepository userRepository) : IUserService
                 Firstname = dto.Firstname,
                 Lastname = dto.Lastname,
                 Password = dto.Password,
-                ConfirmPassword = dto.ConfirmPassword,
                 UserType = dto.UserType,
                 IsUserDisabled = dto.IsUserDisabled,
                 AcceptedTerms = dto.AcceptedTerms
@@ -72,9 +80,54 @@ public class UserService(IUserRepository userRepository) : IUserService
         }
     }
 
-    public Task<ResponseModel<UserModel>> UpdateUserAsync(UpdateUserDto dto)
+    public async Task<ResponseModel<UserModel>> UpdateUserAsync(UpdateUserDto dto)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var existingUser = await userRepository.GetUserByIdAsync(dto.Id);
+
+            if (existingUser is null)
+            {
+                return ResponseModel<UserModel>.Fail($"Usuário com ID {dto.Id} não encontrado.");
+            }
+
+            var duplicateCheck =
+                await userRepository.GetUserAsync(u =>
+                    (u.Email == dto.Email || u.Username == dto.Username) && u.Id != dto.Id);
+
+            if (duplicateCheck is not null)
+            {
+                if (duplicateCheck.Email == dto.Email)
+                    return ResponseModel<UserModel>.Fail("Este e-mail já está sendo utilizado.");
+                if (duplicateCheck.Username == dto.Username)
+                    return ResponseModel<UserModel>.Fail("Este nome de usuário já está sendo utilizado.");
+            }
+
+            var nothingChanged = existingUser.Username == dto.Username
+                                 && existingUser.Email == dto.Email
+                                 && existingUser.Firstname == dto.Firstname
+                                 && existingUser.Lastname == dto.Lastname;
+
+            if (nothingChanged)
+            {
+                return ResponseModel<UserModel>.Fail("Nada foi alterado.");
+            }
+
+            existingUser.Username = dto.Username;
+            existingUser.Email = dto.Email;
+            existingUser.Firstname = dto.Firstname;
+            existingUser.Lastname = dto.Lastname;
+            existingUser.UpdatedAt = DateTime.UtcNow;
+
+            var updatedUser = await userRepository.UpdateUserAsync(existingUser);
+
+            return ResponseModel<UserModel>.Ok(updatedUser, "Usuário atualizado com sucesso.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}");
+        }
     }
 
     public async Task<ResponseModel<UserModel>> DeleteUserAsync(int id)
@@ -85,12 +138,11 @@ public class UserService(IUserRepository userRepository) : IUserService
 
             if (user is null)
             {
-                return ResponseModel<UserModel>.Fail("Usuário não encontrado.");
+                return ResponseModel<UserModel>.Fail($"Nenhum usuário encontrado com o ID {id}.");
             }
 
             await userRepository.DeleteUserAsync(user);
-
-            return ResponseModel<UserModel>.Ok(user, "Usuário deletado com sucesso.");
+            return ResponseModel<UserModel>.Ok(user, $"Usuário {id} deletado com sucesso.");
         }
         catch (Exception ex)
         {
