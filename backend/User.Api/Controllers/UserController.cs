@@ -29,7 +29,14 @@ namespace User.Api.Controllers
             var response = await userService.CreateUserAsync(dto);
             return response.Success ? Ok(response) : BadRequest(response);
         }
-        
+
+        [HttpPost("UpdateUserAsync")]
+        public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserDto dto)
+        {
+            var response = await userService.UpdateUserAsync(dto);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
         [HttpDelete("DeleteUserAsync")]
         public async Task<IActionResult> DeleteUserAsync(int id)
         {
