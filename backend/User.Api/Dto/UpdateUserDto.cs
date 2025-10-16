@@ -1,6 +1,4 @@
-﻿using User.Api.Enum;
-
-namespace User.Api.Dto;
+﻿namespace User.Api.Dto;
 
 public record UpdateUserDto(
     int Id,

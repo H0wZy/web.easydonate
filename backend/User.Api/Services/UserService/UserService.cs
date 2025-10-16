@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using User.Api.Dto;
+﻿using User.Api.Dto;
 using User.Api.Models;
 using User.Api.Repositories.UserRepository;
 
@@ -88,37 +87,59 @@ public class UserService(IUserRepository userRepository) : IUserService
 
             if (existingUser is null)
             {
-                return ResponseModel<UserModel>.Fail($"Usuário com ID {dto.Id} não encontrado.");
+                return ResponseModel<UserModel>.Fail($"Nenhum usuário encontrado com o ID {dto.Id}.");
             }
 
-            var duplicateCheck =
-                await userRepository.GetUserAsync(u =>
-                    (u.Email == dto.Email || u.Username == dto.Username) && u.Id != dto.Id);
+            // ✅ ATUALIZA APENAS CAMPOS NÃO VAZIOS
+            var hasChanges = false;
 
-            if (duplicateCheck is not null)
+            if (!string.IsNullOrWhiteSpace(dto.Username) && dto.Username != existingUser.Username)
             {
-                if (duplicateCheck.Email == dto.Email)
-                    return ResponseModel<UserModel>.Fail("Este e-mail já está sendo utilizado.");
-                if (duplicateCheck.Username == dto.Username)
-                    return ResponseModel<UserModel>.Fail("Este nome de usuário já está sendo utilizado.");
+                existingUser.Username = dto.Username;
+                hasChanges = true;
             }
 
-            var nothingChanged = existingUser.Username == dto.Username
-                                 && existingUser.Email == dto.Email
-                                 && existingUser.Firstname == dto.Firstname
-                                 && existingUser.Lastname == dto.Lastname;
+            if (!string.IsNullOrWhiteSpace(dto.Email) && dto.Email != existingUser.Email)
+            {
+                existingUser.Email = dto.Email;
+                hasChanges = true;
+            }
 
-            if (nothingChanged)
+            if (!string.IsNullOrWhiteSpace(dto.Firstname) && dto.Firstname != existingUser.Firstname)
+            {
+                existingUser.Firstname = dto.Firstname;
+                hasChanges = true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(dto.Lastname) && dto.Lastname != existingUser.Lastname)
+            {
+                existingUser.Lastname = dto.Lastname;
+                hasChanges = true;
+            }
+
+            if (!hasChanges)
             {
                 return ResponseModel<UserModel>.Fail("Nada foi alterado.");
             }
 
-            existingUser.Username = dto.Username;
-            existingUser.Email = dto.Email;
-            existingUser.Firstname = dto.Firstname;
-            existingUser.Lastname = dto.Lastname;
-            existingUser.UpdatedAt = DateTime.UtcNow;
+            // ✅ VALIDAÇÃO DE DUPLICATAS apenas nos campos que mudaram
+            if (!string.IsNullOrWhiteSpace(dto.Username) || !string.IsNullOrWhiteSpace(dto.Email))
+            {
+                var duplicateCheck = await userRepository.GetUserAsync(u =>
+                    (u.Username == dto.Username ||
+                     u.Email == dto.Email) &&
+                    u.Id != dto.Id);
 
+                if (duplicateCheck is not null)
+                {
+                    if (duplicateCheck.Email == dto.Email)
+                        return ResponseModel<UserModel>.Fail("Este e-mail já está sendo utilizado.");
+                    if (duplicateCheck.Username == dto.Username)
+                        return ResponseModel<UserModel>.Fail("Este nome de usuário já está sendo utilizado.");
+                }
+            }
+
+            existingUser.UpdatedAt = DateTime.UtcNow;
             var updatedUser = await userRepository.UpdateUserAsync(existingUser);
 
             return ResponseModel<UserModel>.Ok(updatedUser, "Usuário atualizado com sucesso.");

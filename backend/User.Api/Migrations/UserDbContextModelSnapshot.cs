@@ -50,7 +50,7 @@ namespace User.Api.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("CreatedAt");
 
-                    b.Property<string>("Firstname")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
@@ -59,7 +59,7 @@ namespace User.Api.Migrations
                     b.Property<int>("Id")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Lastname")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)")
@@ -79,7 +79,7 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("State");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer")
                         .HasColumnName("Id");
 
@@ -90,7 +90,7 @@ namespace User.Api.Migrations
 
                     b.HasKey("DonorId");
 
-                    b.HasIndex("Id");
+                    b.HasIndex("UserId");
 
                     b.ToTable("donor", "user", t =>
                         {
@@ -159,7 +159,7 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("State");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer")
                         .HasColumnName("Id");
 
@@ -175,7 +175,7 @@ namespace User.Api.Migrations
 
                     b.HasKey("OrganizationId");
 
-                    b.HasIndex("Id");
+                    b.HasIndex("UserId");
 
                     b.ToTable("organization", "user", t =>
                         {
@@ -196,12 +196,6 @@ namespace User.Api.Migrations
                     b.Property<bool>("AcceptedTerms")
                         .HasColumnType("boolean")
                         .HasColumnName("AcceptedTerms");
-
-                    b.Property<string>("ConfirmPassword")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("character varying(60)")
-                        .HasColumnName("ConfirmPassword");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -252,6 +246,7 @@ namespace User.Api.Migrations
                         .HasColumnName("UserType");
 
                     b.Property<string>("Username")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)")
                         .HasColumnName("Username");
@@ -265,7 +260,7 @@ namespace User.Api.Migrations
                 {
                     b.HasOne("User.Api.Models.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("Id")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -276,7 +271,7 @@ namespace User.Api.Migrations
                 {
                     b.HasOne("User.Api.Models.UserModel", "User")
                         .WithMany()
-                        .HasForeignKey("Id")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
