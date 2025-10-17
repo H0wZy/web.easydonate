@@ -30,10 +30,10 @@ namespace User.Api.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpPost("UpdateUserAsync")]
-        public async Task<IActionResult> UpdateUserAsync([FromBody] UpdateUserDto dto)
+        [HttpPatch("UpdateUserAsync/{id:int}")]
+        public async Task<IActionResult> UpdateUserAsync(int id, [FromBody] UpdateUserDto dto)
         {
-            var response = await userService.UpdateUserAsync(dto);
+            var response = await userService.UpdateUserAsync(id, dto);
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
