@@ -1,6 +1,7 @@
 using User.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using User.Api.Mappings;
 using User.Api.Repositories.UserRepository;
 using User.Api.Services.UserService;
 
@@ -16,6 +17,10 @@ builder.Services.AddOpenApi();
 // Repositórios e Serviços
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+// AutoMapper
+builder.Services.AddAutoMapper(_ => { }, typeof(UserProfile));
+
 
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
