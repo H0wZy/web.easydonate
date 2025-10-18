@@ -1,9 +1,13 @@
-.PHONY: help build up down restart logs clean
+.PHONY: help build up down restart logs clean ps health migrate shell-frontend shell-gateway shell-user shell-auth shell-db rebuild dev
 
-# Cores para output
+# Cores
 GREEN  := \033[0;32m
 YELLOW := \033[0;33m
-NC     := \033[0m # No Color
+NC     := \033[0m
+
+# Carrega variáveis do .env
+include .env
+export
 
 help: ## Mostra esta mensagem de ajuda
 	@echo "$(GREEN)Comandos disponíveis:$(NC)"
@@ -17,11 +21,11 @@ up: ## Sobe todos os containers
 	@echo "$(GREEN)Iniciando containers...$(NC)"
 	docker compose up -d
 	@echo "$(GREEN)Containers iniciados! Acesse:$(NC)"
-	@echo "  Frontend:    http://localhost:3000"
-	@echo "  Gateway:     http://localhost:5050"
-	@echo "  User API:    http://localhost:5290"
-	@echo "  Auth API:    http://localhost:5033"
-	@echo "  PostgreSQL:  localhost:5432"
+	@echo "  Frontend:    http://localhost:${FRONTEND_PORT}"
+	@echo "  Gateway:     http://localhost:${GATEWAY_API_PORT}"
+	@echo "  User API:    http://localhost:${USER_API_PORT}"
+	@echo "  Auth API:    http://localhost:${AUTH_API_PORT}"
+	@echo "  PostgreSQL:  localhost:${POSTGRES_PORT}"
 
 down: ## Para todos os containers
 	@echo "$(YELLOW)Parando containers...$(NC)"
@@ -57,7 +61,7 @@ ps: ## Lista status dos containers
 
 health: ## Verifica health dos serviços
 	@echo "$(GREEN)Status dos serviços:$(NC)"
-	@docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
+	docker compose ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
 
 migrate: ## Executa migrations do banco de dados
 	@echo "$(GREEN)Executando migrations...$(NC)"
@@ -77,7 +81,7 @@ shell-auth: ## Acessa shell do container auth-api
 	docker compose exec auth-api sh
 
 shell-db: ## Acessa shell do PostgreSQL
-	docker compose exec postgres psql -U admeasydonate -d web_easydonate
+	docker compose exec postgres psql -U ${POSTGRES_USER} -d ${POSTGRES_DB}
 
 rebuild: ## Rebuild completo (limpa + build + up)
 	@echo "$(YELLOW)Iniciando rebuild completo...$(NC)"
