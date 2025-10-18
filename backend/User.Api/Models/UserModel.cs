@@ -16,12 +16,14 @@ public class UserModel
     [Column("Email")] [StringLength(255)] public required string Email { get; set; }
 
     [Column("Firstname")]
-    [StringLength(255)]
+    [StringLength(255)] 
     public required string Firstname { get; set; }
 
     [Column("Lastname")]
     [StringLength(255)]
     public required string Lastname { get; set; }
+
+    [Column("Fullname")] public string Fullname => $"{Firstname} {Lastname}";
 
     [Column("Password")]
     [StringLength(60)] // BCrypt sempre gera 60 caracteres
