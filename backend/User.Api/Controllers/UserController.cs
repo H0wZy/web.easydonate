@@ -16,10 +16,24 @@ namespace User.Api.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpGet("GetUserById")]
+        [HttpGet("GetUserById/{id:int}")]
         public async Task<ActionResult<ResponseModel<UserModel>>> GetUserById(int id)
         {
             var response = await userService.GetUserByIdAsync(id);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+        [HttpGet("GetUserByUsername/{username}")]
+        public async Task<ActionResult<ResponseModel<UserModel>>> GetUserByUsername(string username)
+        {
+            var response = await userService.GetUserByUsernameAsync(username);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+        [HttpGet("GetUserByEmail/{email}")]
+        public async Task<ActionResult<ResponseModel<UserModel>>> GetUserByEmail(string email)
+        {
+            var response = await userService.GetUserByEmailAsync(email);
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
@@ -41,6 +55,13 @@ namespace User.Api.Controllers
         public async Task<ActionResult<ResponseModel<object>>> DeleteUserById(int id)
         {
             var response = await userService.DeleteUserByIdAsync(id);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
+        [HttpPatch("DisableUserById/{id:int}")]
+        public async Task<ActionResult<ResponseModel<UserModel>>> DisableUserById(int id)
+        {
+            var response = await userService.DisableUserByIdAsync(id);
             return response.Success ? Ok(response) : BadRequest(response);
         }
     }
