@@ -1,28 +1,137 @@
 version: '3.8'
 
 services:
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "5076:5000"
+  # ===========================================
+  # BANCO DE DADOS
+  # ===========================================
+  postgres:
+    image: postgres:18-alpine
+    container_name: easydonate-postgres
+    restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      POSTGRES_DB: web_easydonate
+      POSTGRES_USER: admeasydonate
+      POSTGRES_PASSWORD: edadm
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
     networks:
       - easydonate-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admeasydonate"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # ===========================================
+  # BACKEND - MICROSERVIÇOS
+  # ===========================================
+  
+  # User API
+  user-api:
+    build:
+      context: ./backend
+      dockerfile: User.Api/Dockerfile
+    container_name: easydonate-user-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=web_easydonate;Username=admeasydonate;Password=edadm;Port=5432;SearchPath=user
+    ports:
+      - "5290:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - easydonate-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Auth API
+  auth-api:
+    build:
+      context: ./backend
+      dockerfile: Auth.Api/Dockerfile
+    container_name: easydonate-auth-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=web_easydonate;Username=admeasydonate;Password=edadm;Port=5432;SearchPath=auth
+    ports:
+      - "5033:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - easydonate-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: Api.Gateway/Dockerfile
+    container_name: easydonate-gateway
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Services__UserApi=http://user-api:8080
+      - Services__AuthApi=http://auth-api:8080
+    ports:
+      - "5050:8080"
+    depends_on:
+      - user-api
+      - auth-api
+    networks:
+      - easydonate-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ===========================================
+  # FRONTEND
+  # ===========================================
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:5050
+    container_name: easydonate-frontend
+    restart: unless-stopped
     ports:
       - "3000:80"
     depends_on:
-      - backend
+      - api-gateway
     networks:
       - easydonate-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
+# ===========================================
+# NETWORKS
+# ===========================================
 networks:
   easydonate-network:
     driver: bridge
+
+# ===========================================
+# VOLUMES
+# ===========================================
+volumes:
+  postgres_data:
+    driver: local

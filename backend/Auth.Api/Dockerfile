@@ -1,23 +1,46 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-USER $APP_UID
+﻿# =====================================
+# Estágio 1: Build
+# =====================================
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+
+# Copiar arquivos de projeto e restaurar dependências
+COPY ["Auth.Api/Auth.Api.csproj", "Auth.Api/"]
+RUN dotnet restore "Auth.Api/Auth.Api.csproj"
+
+# Copiar todo o código e compilar
+COPY . .
+WORKDIR "/src/Auth.Api"
+RUN dotnet build "Auth.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# =====================================
+# Estágio 2: Publish
+# =====================================
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "Auth.Api.csproj" \
+    -c $BUILD_CONFIGURATION \
+    -o /app/publish \
+    /p:UseAppHost=false
+
+# =====================================
+# Estágio 3: Runtime
+# =====================================
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+
+# Instalar curl para healthchecks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["User.Api/User.Api.csproj", "User.Api/"]
-RUN dotnet restore "User.Api/User.Api.csproj"
-COPY . .
-WORKDIR "/src/User.Api"
-RUN dotnet build "./User.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./User.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
-WORKDIR /app
+# Copiar artefatos publicados
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "User.Api.dll"]
+
+# Criar usuário não-root para segurança
+RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
+USER appuser
+
+ENTRYPOINT ["dotnet", "Auth.Api.dll"]
