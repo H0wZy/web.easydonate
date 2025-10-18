@@ -10,7 +10,7 @@ public class UserProfile : Profile
     {
         CreateMap<UpdateUserDto, UserModel>()
             .ForAllMembers(opt
-                => opt.Condition((src, dest, srcMember)
+                => opt.Condition((_, _, srcMember)
                     => srcMember is not null));
     }
 }

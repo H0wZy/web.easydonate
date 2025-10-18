@@ -90,7 +90,7 @@
 //         return response;
 //     }
 //
-//     public async Task<RespondeModel<List<UserModel?>>> UpdateUserAsync(UpdateUserDto updateUserDto)
+//     public async Task<RespondeModel<List<UserModel?>>> UpdateUserByIdAsync(UpdateUserDto updateUserDto)
 //     {
 //         RespondeModel<List<UserModel?>> response = new();
 //         try
@@ -126,7 +126,7 @@
 //         return response;
 //     }
 //
-//     public async Task<RespondeModel<List<UserModel?>>> DeleteUserAsync(int id)
+//     public async Task<RespondeModel<List<UserModel?>>> DeleteUserByIdAsync(int id)
 //     {
 //         RespondeModel<List<UserModel?>> response = new();
 //
@@ -178,12 +178,12 @@
 //         throw new NotImplementedException();
 //     }
 //
-//     public Task<UserModel?> UpdateUserAsync(UserModel? user)
+//     public Task<UserModel?> UpdateUserByIdAsync(UserModel? user)
 //     {
 //         throw new NotImplementedException();
 //     }
 //
-//     public Task<UserModel?> DeleteUserAsync(UserModel? user)
+//     public Task<UserModel?> DeleteUserByIdAsync(UserModel? user)
 //     {
 //         throw new NotImplementedException();
 //     }

@@ -1,14 +1,20 @@
+using System.ComponentModel;
 using User.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using User.Api.Mappings;
 using User.Api.Repositories.UserRepository;
 using User.Api.Services.UserService;
+using User.Api.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddOpenApi();
@@ -20,6 +26,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(_ => { }, typeof(UserProfile));
+
+//DateTime Converter
 
 
 builder.Services.AddDbContext<UserDbContext>(options =>
@@ -38,7 +46,8 @@ if (app.Environment.IsDevelopment())
     {
         options.Title = "User.Api";
         options.Theme = ScalarTheme.Default;
-        options.DefaultHttpClient = new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
+        options.DefaultHttpClient =
+            new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 
     // app.UseSwagger();

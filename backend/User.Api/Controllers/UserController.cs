@@ -9,38 +9,38 @@ namespace User.Api.Controllers
     [ApiController]
     public class UserController(IUserService userService) : ControllerBase
     {
-        [HttpGet("GetAllUsersAsync")]
-        public async Task<ActionResult<ResponseModel<List<UserModel>>>> GetAllUsersAsync()
+        [HttpGet("GetAllUsers")]
+        public async Task<ActionResult<ResponseModel<List<UserModel>>>> GetAllUsers()
         {
             var response = await userService.GetAllUsersAsync();
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpGet("GetUserByIdAsync")]
-        public async Task<ActionResult<ResponseModel<UserModel>>> GetUserByIdAsync(int id)
+        [HttpGet("GetUserById")]
+        public async Task<ActionResult<ResponseModel<UserModel>>> GetUserById(int id)
         {
             var response = await userService.GetUserByIdAsync(id);
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpPost("CreateUserAsync")]
-        public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserDto dto)
+        [HttpPost("CreateUser")]
+        public async Task<ActionResult<ResponseModel<UserModel>>> CreateUser([FromBody] CreateUserDto dto)
         {
             var response = await userService.CreateUserAsync(dto);
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpPatch("UpdateUserAsync/{id:int}")]
-        public async Task<IActionResult> UpdateUserAsync(int id, [FromBody] UpdateUserDto dto)
+        [HttpPatch("UpdateUserById/{id:int}")]
+        public async Task<ActionResult<ResponseModel<UserModel>>> UpdateUserById(int id, [FromBody] UpdateUserDto dto)
         {
-            var response = await userService.UpdateUserAsync(id, dto);
+            var response = await userService.UpdateUserByIdAsync(id, dto);
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
-        [HttpDelete("DeleteUserAsync")]
-        public async Task<IActionResult> DeleteUserAsync(int id)
+        [HttpDelete("DeleteUserById/{id:int}")]
+        public async Task<ActionResult<ResponseModel<object>>> DeleteUserById(int id)
         {
-            var response = await userService.DeleteUserAsync(id);
+            var response = await userService.DeleteUserByIdAsync(id);
             return response.Success ? Ok(response) : BadRequest(response);
         }
     }

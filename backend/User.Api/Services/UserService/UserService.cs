@@ -80,7 +80,7 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
         }
     }
 
-    public async Task<ResponseModel<UserModel>> UpdateUserAsync(int id, UpdateUserDto dto)
+    public async Task<ResponseModel<UserModel>> UpdateUserByIdAsync(int id, UpdateUserDto dto)
     {
         try
         {
@@ -95,7 +95,7 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
                 return ResponseModel<UserModel>.Fail("Nenhum campo alterado.");
 
             mapper.Map(dto, user);
-
+            user.UpdatedAt = DateTime.UtcNow;
             await userRepository.UpdateUserAsync(user);
 
             return ResponseModel<UserModel>.Ok(user, "Usuário atualizado com sucesso.");
@@ -107,7 +107,7 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
         }
     }
 
-    public async Task<ResponseModel<UserModel>> DeleteUserAsync(int id)
+    public async Task<ResponseModel<UserModel>> DeleteUserByIdAsync(int id)
     {
         try
         {
