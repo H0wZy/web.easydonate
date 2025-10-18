@@ -30,11 +30,6 @@ public record CreateUserDto : IValidatableObject
     // ReSharper disable once MemberCanBePrivate.Global
     public string ConfirmPassword { get; init; } = string.Empty;
 
-    [Required(ErrorMessage = "É necessário aceitar os termos de uso.")]
-    public bool AcceptedTerms { get; init; }
-
-    public bool IsUserDisabled {get; init; } = false;
- 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (!Password.Any(char.IsUpper))
