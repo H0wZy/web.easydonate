@@ -9,18 +9,18 @@ services:
     container_name: easydonate-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: web_easydonate
-      POSTGRES_USER: admeasydonate
-      POSTGRES_PASSWORD: edadm
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+      - ./databases/scripts/init.${POSTGRES_DB}.sh:/docker-entrypoint-initdb.d/init-databases.sh
     networks:
-      - easydonate-network
+      - ${NETWORK_NAME}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admeasydonate"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -37,22 +37,22 @@ services:
     container_name: easydonate-user-api
     restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=web_easydonate;Username=admeasydonate;Password=edadm;Port=5432;SearchPath=user
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Port=${POSTGRES_PORT};SearchPath=${USER_DB_SEARCHPATH}
     ports:
-      - "5290:8080"
+      - "${USER_API_PORT}:8080"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - easydonate-network
+      - ${NETWORK_NAME}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-# Auth API
+  # Auth API
   auth-api:
     build:
       context: ./backend
@@ -60,15 +60,15 @@ services:
     container_name: easydonate-auth-api
     restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=web_easydonate;Username=admeasydonate;Password=edadm;Port=5432;SearchPath=auth
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Port=${POSTGRES_PORT};SearchPath=${AUTH_DB_SEARCHPATH}
     ports:
-      - "5033:8080"
+      - "${AUTH_API_PORT}:8080"
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - easydonate-network
+      - ${NETWORK_NAME}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -80,19 +80,19 @@ services:
     build:
       context: ./backend
       dockerfile: Api.Gateway/Dockerfile
-    container_name: easydonate-gateway
+    container_name: easydonate-gateway-api
     restart: unless-stopped
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - Services__UserApi=http://user-api:8080
       - Services__AuthApi=http://auth-api:8080
     ports:
-      - "5050:8080"
+      - "${GATEWAY_PORT}:8080"
     depends_on:
       - user-api
       - auth-api
     networks:
-      - easydonate-network
+      - ${NETWORK_NAME}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -107,15 +107,15 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        - VITE_API_URL=http://localhost:5050
+        - VITE_API_URL=http://localhost:${GATEWAY_PORT}
     container_name: easydonate-frontend
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "${FRONTEND_PORT}:80"
     depends_on:
       - api-gateway
     networks:
-      - easydonate-network
+      - ${NETWORK_NAME}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 30s
@@ -126,7 +126,7 @@ services:
 # NETWORKS
 # ===========================================
 networks:
-  easydonate-network:
+  ${NETWORK_NAME}:
     driver: bridge
 
 # ===========================================
