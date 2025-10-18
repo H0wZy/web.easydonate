@@ -42,6 +42,40 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
         }
     }
 
+    public async Task<ResponseModel<UserModel>> GetUserByUsernameAsync(string username)
+    {
+        try
+        {
+            var user = await userRepository.GetUserAsync(u => u.Username == username);
+
+            return user is null
+                ? ResponseModel<UserModel>.Fail("Usuário não encontrado.")
+                : ResponseModel<UserModel>.Ok(user, "Usuário encontrado com sucesso.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}.");
+        }
+    }
+
+    public async Task<ResponseModel<UserModel>> GetUserByEmailAsync(string email)
+    {
+        try
+        {
+            var user = await userRepository.GetUserAsync(u => u.Email == email);
+
+            return user is null
+                ? ResponseModel<UserModel>.Fail("Usuário não encontrado.")
+                : ResponseModel<UserModel>.Ok(user, "Usuário encontrado com sucesso.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}.");
+        }
+    }
+
     public async Task<ResponseModel<UserModel>> CreateUserAsync(CreateUserDto dto)
     {
         try
@@ -65,9 +99,7 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
                 Firstname = dto.Firstname,
                 Lastname = dto.Lastname,
                 Password = dto.Password,
-                UserType = dto.UserType,
-                IsUserDisabled = dto.IsUserDisabled,
-                AcceptedTerms = dto.AcceptedTerms
+                UserType = dto.UserType
             };
 
             var createdUser = await userRepository.CreateUserAsync(user);
@@ -94,6 +126,19 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
             if (dto.Username == null && dto.Email == null && dto.Firstname == null && dto.Lastname == null)
                 return ResponseModel<UserModel>.Fail("Nenhum campo alterado.");
 
+            var duplicateCheck = await userRepository.GetUserAsync(u =>
+                (u.Username == dto.Username ||
+                 u.Email == dto.Email) &&
+                u.Id != id);
+
+            if (duplicateCheck is not null)
+            {
+                if (duplicateCheck.Email == dto.Email)
+                    return ResponseModel<UserModel>.Fail("Este e-mail já está sendo utilizado.");
+                if (duplicateCheck.Username == dto.Username)
+                    return ResponseModel<UserModel>.Fail("Este nome de usuário já está sendo utilizado.");
+            }
+
             mapper.Map(dto, user);
             user.UpdatedAt = DateTime.UtcNow;
             await userRepository.UpdateUserAsync(user);
@@ -119,12 +164,37 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
             }
 
             await userRepository.DeleteUserAsync(user);
+
             return ResponseModel<UserModel>.Ok(user, $"Usuário {id} deletado com sucesso.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
             return ResponseModel<UserModel>.Fail($"Erro ao deletar: {ex.Message}");
+        }
+    }
+
+    public async Task<ResponseModel<UserModel>> DisableUserByIdAsync(int id)
+    {
+        try
+        {
+            var user = await userRepository.GetUserByIdAsync(id);
+
+            if (user is null)
+            {
+                return ResponseModel<UserModel>.Fail("Usuário não encontrado.");
+            }
+
+            user.IsUserDisabled = true;
+            user.UpdatedAt = DateTime.UtcNow;
+            await userRepository.UpdateUserAsync(user);
+
+            return ResponseModel<UserModel>.Ok(user, "Usuário desativado com sucesso.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return ResponseModel<UserModel>.Fail($"Erro ao desativar: {ex.Message}");
         }
     }
 }
