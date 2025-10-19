@@ -28,10 +28,7 @@ builder.Services.AddAutoMapper(_ => { }, typeof(UserProfile));
 builder.Services.AddSingleton<JsonDateTimeConverter>();
 
 builder.Services.AddDbContext<UserDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsHistoryTable("__EFMigrationsHistory", "user")));
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -41,7 +38,6 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
     try
     {
-        await SchemaCreator.CreateUserSchemaAsync(db);
         db.Database.Migrate();
     }
     catch (Exception ex)

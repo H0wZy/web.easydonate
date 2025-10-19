@@ -2,6 +2,7 @@
 using User.Api.Dto;
 using User.Api.Models;
 using User.Api.Repositories.UserRepository;
+using User.Api.Utils;
 
 namespace User.Api.Services.UserService;
 
@@ -91,6 +92,8 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
                 if (existingData.Username == dto.Username)
                     return ResponseModel<UserModel>.Fail("Nome de usuário já cadastrado.");
             }
+            
+            var (hashPassword, saltPassword) = PasswordHelper.HashPassword(dto.Password);
 
             var user = new UserModel
             {
@@ -98,7 +101,8 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
                 Email = dto.Email,
                 Firstname = dto.Firstname,
                 Lastname = dto.Lastname,
-                Password = dto.Password,
+                HashPassword = hashPassword,
+                SaltPassword = saltPassword,
                 UserType = dto.UserType
             };
 

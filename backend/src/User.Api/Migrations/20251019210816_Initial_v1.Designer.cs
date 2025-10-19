@@ -12,15 +12,14 @@ using User.Api.Data;
 namespace User.Api.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20251019034504_Initial")]
-    partial class Initial
+    [Migration("20251019210816_Initial_v1")]
+    partial class Initial_v1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("user")
                 .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -95,7 +94,7 @@ namespace User.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("donor", "user", t =>
+                    b.ToTable("donor", t =>
                         {
                             t.Property("Id")
                                 .HasColumnName("Id1");
@@ -180,7 +179,7 @@ namespace User.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("organization", "user", t =>
+                    b.ToTable("organization", t =>
                         {
                             t.Property("Id")
                                 .HasColumnName("Id1");
@@ -196,9 +195,9 @@ namespace User.Api.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("AcceptedTerms")
-                        .HasColumnType("boolean")
-                        .HasColumnName("AcceptedTerms");
+                    b.Property<DateTime?>("AcceptedTermsDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("TermsConsentDate");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -216,6 +215,15 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("Firstname");
 
+                    b.Property<byte[]>("HashPassword")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("HashPassword");
+
+                    b.Property<bool>("IsAcceptedTerms")
+                        .HasColumnType("boolean")
+                        .HasColumnName("AcceptedTerms");
+
                     b.Property<bool>("IsUserDisabled")
                         .HasColumnType("boolean")
                         .HasColumnName("IsUserDisabled");
@@ -230,15 +238,10 @@ namespace User.Api.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("Lastname");
 
-                    b.Property<string>("Password")
+                    b.Property<byte[]>("SaltPassword")
                         .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("character varying(60)")
-                        .HasColumnName("Password");
-
-                    b.Property<DateTime?>("TermsConsentDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("TermsConsentDate");
+                        .HasColumnType("bytea")
+                        .HasColumnName("SaltPassword");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -256,7 +259,7 @@ namespace User.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("user", "user");
+                    b.ToTable("user");
                 });
 
             modelBuilder.Entity("User.Api.Models.DonorModel", b =>

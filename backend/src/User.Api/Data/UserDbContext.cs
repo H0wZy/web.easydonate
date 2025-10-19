@@ -11,7 +11,8 @@ public class UserDbContext(DbContextOptions<UserDbContext> options) : DbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("user");
+        // Remover schema específico - usar schema padrão 'public'
+        // modelBuilder.HasDefaultSchema("user");
 
         modelBuilder.Entity<DonorModel>()
             .HasOne(d => d.User)
@@ -24,7 +25,6 @@ public class UserDbContext(DbContextOptions<UserDbContext> options) : DbContext(
             .WithMany()
             .HasForeignKey(o => o.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
 
         base.OnModelCreating(modelBuilder);
     }

@@ -1,30 +1,57 @@
 services:
   # ===========================================
-  # BANCO DE DADOS
+  # USER.API DATABASE
   # ===========================================
-  postgres:
+  user-db:
     image: postgres:18-alpine
-    container_name: easydonate-postgres
+    container_name: user-db-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # Variables used by postgres image for initial DB/user creation
+      POSTGRES_DB: ${USER_DB}
+      POSTGRES_USER: ${USER_DB_USER}
+      POSTGRES_PASSWORD: ${USER_DB_PASSWORD}
+      # Keep USER_DB* variables available for custom init scripts that rely on them
+      USER_DB: ${USER_DB}
+      USER_DB_USER: ${USER_DB_USER}
+      USER_DB_PASSWORD: ${USER_DB_PASSWORD}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${USER_DB_PORT}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./databases/scripts/init.${POSTGRES_DB}.sh:/docker-entrypoint-initdb.d/init-databases.sh
+      - user_db_data:/var/lib/postgresql/data
     networks:
       - web-easydonate-network
     healthcheck:
       # pg_isready without -d will try to connect to a database with the same
       # name as the user, which in our case (admeasydonate) does not exist and
       # generates repeated FATAL logs. Specify the database explicitly.
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${USER_DB_USER} -d ${USER_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # ===========================================
+  # TODO: AUTH.API DATABASE 
+  # ===========================================
+  # auth-db:
+  #   image: postgres:18-alpine
+  #   container_name: dbauth-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     AUTH_DB: ${AUTH_DB}
+  #     AUTH_DB_USER: ${AUTH_DB_USER}
+  #     AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD}
+  #   ports:
+  #     - "${AUTH_DB_PORT}:5432"
+  #   volumes:
+  #     - auth_db_data:/var/lib/postgresql/data
+  #   networks:
+  #     - web-easydonate-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${AUTH_DB_USER} -d ${AUTH_DB}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
   # ===========================================
   # BACKEND - MICROSERVIÇOS
@@ -39,11 +66,11 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Port=${POSTGRES_PORT};SearchPath=${USER_DB_SEARCHPATH}
+      - ConnectionStrings__DefaultConnection=Host=user-db;Database=${USER_DB};Username=${USER_DB_USER};Password=${USER_DB_PASSWORD};Port=5432;
     ports:
       - "${USER_API_PORT}:8080"
     depends_on:
-      postgres:
+      user-db:
         condition: service_healthy
     networks:
       - web-easydonate-network
@@ -62,12 +89,12 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Port=${POSTGRES_PORT};SearchPath=${AUTH_DB_SEARCHPATH}
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=${AUTH_DB};Username=${AUTH_DB_USER};Password=${AUTH_DB_PASSWORD};Port=${AUTH_DB_PORT};
     ports:
       - "${AUTH_API_PORT}:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
+    # depends_on:
+    #   auth-db:
+    #     condition: service_healthy
     networks:
       - web-easydonate-network
     healthcheck:
@@ -134,5 +161,5 @@ networks:
 # VOLUMES
 # ===========================================
 volumes:
-  postgres_data:
-    driver: local
+  user_db_data:
+  # auth_db_data:

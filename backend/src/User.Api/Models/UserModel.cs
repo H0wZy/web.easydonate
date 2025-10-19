@@ -29,10 +29,6 @@ public class UserModel
 
     [Column("SaltPassword")] public byte[] SaltPassword { get; set; }
 
-    [Column("Password")]
-    [StringLength(60)] // BCrypt sempre gera 60 caracteres
-    public required string Password { get; set; } = string.Empty;
-
     [Column("UserType")] public required UserType UserType { get; set; } // "Doador", "Ong", "ADM"
 
     [Column("CreatedAt")] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

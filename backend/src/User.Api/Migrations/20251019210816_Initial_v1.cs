@@ -7,17 +7,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace User.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Initial_v1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.EnsureSchema(
-                name: "user");
-
             migrationBuilder.CreateTable(
                 name: "user",
-                schema: "user",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -26,14 +22,15 @@ namespace User.Api.Migrations
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Firstname = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Lastname = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Password = table.Column<string>(type: "character varying(60)", maxLength: 60, nullable: false),
+                    HashPassword = table.Column<byte[]>(type: "bytea", nullable: false),
+                    SaltPassword = table.Column<byte[]>(type: "bytea", nullable: false),
                     UserType = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastLoginAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    TermsConsentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsUserDisabled = table.Column<bool>(type: "boolean", nullable: false),
-                    AcceptedTerms = table.Column<bool>(type: "boolean", nullable: false)
+                    AcceptedTerms = table.Column<bool>(type: "boolean", nullable: false),
+                    TermsConsentDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -42,7 +39,6 @@ namespace User.Api.Migrations
 
             migrationBuilder.CreateTable(
                 name: "donor",
-                schema: "user",
                 columns: table => new
                 {
                     DonorId = table.Column<int>(type: "integer", nullable: false)
@@ -66,7 +62,6 @@ namespace User.Api.Migrations
                     table.ForeignKey(
                         name: "FK_donor_user_Id",
                         column: x => x.Id,
-                        principalSchema: "user",
                         principalTable: "user",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -74,7 +69,6 @@ namespace User.Api.Migrations
 
             migrationBuilder.CreateTable(
                 name: "organization",
-                schema: "user",
                 columns: table => new
                 {
                     OrganizationId = table.Column<int>(type: "integer", nullable: false)
@@ -100,7 +94,6 @@ namespace User.Api.Migrations
                     table.ForeignKey(
                         name: "FK_organization_user_Id",
                         column: x => x.Id,
-                        principalSchema: "user",
                         principalTable: "user",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -108,13 +101,11 @@ namespace User.Api.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_donor_Id",
-                schema: "user",
                 table: "donor",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_organization_Id",
-                schema: "user",
                 table: "organization",
                 column: "Id");
         }
@@ -123,16 +114,13 @@ namespace User.Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "donor",
-                schema: "user");
+                name: "donor");
 
             migrationBuilder.DropTable(
-                name: "organization",
-                schema: "user");
+                name: "organization");
 
             migrationBuilder.DropTable(
-                name: "user",
-                schema: "user");
+                name: "user");
         }
     }
 }
