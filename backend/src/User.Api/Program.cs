@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using User.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -42,7 +41,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
     try
     {
-        db.Database.ExecuteSqlRaw("CREATE SCHEMA IF NOT EXISTS \"user\";");
+        await SchemaCreator.CreateUserSchemaAsync(db);
         db.Database.Migrate();
     }
     catch (Exception ex)
@@ -63,7 +62,6 @@ if (app.Environment.IsDevelopment())
         options.DefaultHttpClient =
             new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
-
 }
 
 app.UseHttpsRedirection();
