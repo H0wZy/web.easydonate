@@ -1,21 +1,23 @@
 # =====================================
 # Estágio 1: Build
 # =====================================
-FROM node:22-alpine AS build
+FROM node:22 AS build
 
 # Argumentos de build
-ARG VITE_API_URL=http://localhost:5050
+ARG VITE_API_URL=http://localhost:5000
 
 WORKDIR /app
 
 # Copiar package files e instalar dependências
 COPY package*.json ./
-RUN npm ci --only=production
+
+# Instala todas as dependências, incluindo dev
+RUN npm ci
 
 # Copiar código fonte
 COPY . .
 
-# Build da aplicação
+# Setar variável de ambiente e build
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 

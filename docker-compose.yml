@@ -16,9 +16,9 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ${INIT_DB_SCRIPT}:/docker-entrypoint-initdb.d/init-databases.sh
+      - ./databases/scripts/init.${POSTGRES_DB}.sh:/docker-entrypoint-initdb.d/init-databases.sh
     networks:
-      - ${NETWORK_NAME}
+      - web-easydonate-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
@@ -28,11 +28,11 @@ services:
   # ===========================================
   # BACKEND - MICROSERVIÇOS
   # ===========================================
-  
+
   # User API
   user-api:
     build:
-      context: ./backend
+      context: ./backend/src
       dockerfile: User.Api/Dockerfile
     container_name: easydonate-user-api
     restart: unless-stopped
@@ -45,7 +45,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - ${NETWORK_NAME}
+      - web-easydonate-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -55,7 +55,7 @@ services:
   # Auth API
   auth-api:
     build:
-      context: ./backend
+      context: ./backend/src
       dockerfile: Auth.Api/Dockerfile
     container_name: easydonate-auth-api
     restart: unless-stopped
@@ -68,7 +68,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - ${NETWORK_NAME}
+      - web-easydonate-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -78,7 +78,7 @@ services:
   # API Gateway
   api-gateway:
     build:
-      context: ./backend
+      context: ./backend/src
       dockerfile: Api.Gateway/Dockerfile
     container_name: easydonate-gateway-api
     restart: unless-stopped
@@ -89,12 +89,10 @@ services:
     ports:
       - "${GATEWAY_API_PORT}:8080"
     depends_on:
-      user-api:
-        condition: service_healthy
-      auth-api:
-        condition: service_healthy
+      - user-api
+      - auth-api
     networks:
-      - ${NETWORK_NAME}
+      - web-easydonate-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -117,7 +115,7 @@ services:
     depends_on:
       - api-gateway
     networks:
-      - ${NETWORK_NAME}
+      - web-easydonate-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 30s
@@ -128,7 +126,7 @@ services:
 # NETWORKS
 # ===========================================
 networks:
-  ${NETWORK_NAME}:
+  web-easydonate-network:
     driver: bridge
 
 # ===========================================

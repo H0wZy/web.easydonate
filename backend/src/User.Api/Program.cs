@@ -16,9 +16,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddOpenApi();
-// builder.Services.AddSwaggerGen();
 
 // Repositórios e Serviços
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -28,7 +26,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddAutoMapper(_ => { }, typeof(UserProfile));
 
 //DateTime Converter
-
+builder.Services.AddSingleton<JsonDateTimeConverter>();
 
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -37,6 +35,13 @@ builder.Services.AddDbContext<UserDbContext>(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 
 var app = builder.Build();
+
+// Aplica migrations automaticamente
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+    db.Database.Migrate(); // Cria as tabelas do schema "user" automaticamente
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -50,12 +55,6 @@ if (app.Environment.IsDevelopment())
             new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
     });
 
-    // app.UseSwagger();
-    // app.UseSwaggerUI(c =>
-    // {
-    //     c.SwaggerEndpoint("/swagger/v1/swagger.json", "User.Api v1");
-    //     c.RoutePrefix = string.Empty;
-    // });
 }
 
 app.UseHttpsRedirection();
