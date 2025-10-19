@@ -40,7 +40,16 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<UserDbContext>();
-    db.Database.Migrate(); // Cria as tabelas do schema "user" automaticamente
+    try
+    {
+        db.Database.ExecuteSqlRaw("CREATE SCHEMA IF NOT EXISTS \"user\";");
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Erro ao migrar banco: " + ex.Message);
+        throw;
+    }
 }
 
 // Configure the HTTP request pipeline.
