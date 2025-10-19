@@ -20,7 +20,10 @@ services:
     networks:
       - web-easydonate-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      # pg_isready without -d will try to connect to a database with the same
+      # name as the user, which in our case (admeasydonate) does not exist and
+      # generates repeated FATAL logs. Specify the database explicitly.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
