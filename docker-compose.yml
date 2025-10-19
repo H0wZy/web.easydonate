@@ -16,7 +16,7 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./databases/scripts/init.${POSTGRES_DB}.sh:/docker-entrypoint-initdb.d/init-databases.sh
+      - ${INIT_DB_SCRIPT}:/docker-entrypoint-initdb.d/init-databases.sh
     networks:
       - ${NETWORK_NAME}
     healthcheck:
@@ -89,8 +89,10 @@ services:
     ports:
       - "${GATEWAY_API_PORT}:8080"
     depends_on:
-      - user-api
-      - auth-api
+      user-api:
+        condition: service_healthy
+      auth-api:
+        condition: service_healthy
     networks:
       - ${NETWORK_NAME}
     healthcheck:
