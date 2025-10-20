@@ -1,17 +1,23 @@
+# Define o shell padrão como bash (essencial para MINGW64)
+SHELL := /bin/bash
 .PHONY: help build up down restart logs clean ps health migrate shell-frontend shell-gateway shell-user shell-auth shell-db rebuild dev
 
 # Cores
-GREEN  := \033[0;32m
-YELLOW := \033[0;33m
-NC     := \033[0m
+# Usamos $(shell echo -e) para gerar o caractere de escape real,
+# em vez da string literal "\033".
+ESC    := $(shell echo -e "\033")
+GREEN  := $(ESC)[0;32m
+YELLOW := $(ESC)[0;33m
+NC     := $(ESC)[0m
 
 # Carrega variáveis do .env
 include .env
 export
 
+# IMPORTANTE: Salve este arquivo com codificação UTF-8
 help: ## Mostra esta mensagem de ajuda
 	@echo "$(GREEN)Comandos disponíveis:$(NC)"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-15s$(NC) %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf " 	$(YELLOW)%-15s$(NC) %s\n", $$1, $$2}'
 
 build: ## Build de todas as imagens Docker
 	@echo "$(GREEN)Building imagens Docker...$(NC)"
@@ -21,11 +27,11 @@ up: ## Sobe todos os containers
 	@echo "$(GREEN)Iniciando containers...$(NC)"
 	docker compose up -d
 	@echo "$(GREEN)Containers iniciados! Acesse:$(NC)"
-	@echo "  Frontend:    http://localhost:${FRONTEND_PORT}"
-	@echo "  Gateway:     http://localhost:${GATEWAY_API_PORT}"
-	@echo "  User API:    http://localhost:${USER_API_PORT}"
-	@echo "  Auth API:    http://localhost:${AUTH_API_PORT}"
-	@echo "  PostgreSQL:  localhost:${POSTGRES_PORT}"
+	@echo " 	Frontend: 	http://localhost:${FRONTEND_PORT}"
+	@echo " 	Gateway: 	 http://localhost:${GATEWAY_API_PORT}"
+	@echo " 	User API: 	http://localhost:${USER_API_PORT}"
+	@echo " 	Auth API: 	http://localhost:${AUTH_API_PORT}"
+	@echo " 	PostgreSQL: 	localhost:${POSTGRES_PORT}"
 
 down: ## Para todos os containers
 	@echo "$(YELLOW)Parando containers...$(NC)"
@@ -90,5 +96,6 @@ rebuild: ## Rebuild completo (limpa + build + up)
 	@$(MAKE) up
 	@echo "$(GREEN)Rebuild concluído!$(NC)"
 
+# IMPORTANTE: Salve este arquivo com codificação UTF-8
 dev: ## Modo desenvolvimento (logs visíveis)
 	docker compose up
