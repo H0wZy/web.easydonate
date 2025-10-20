@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-    </PropertyGroup>
+      <UserSecretsId>0d269e5a-a85c-4be3-a8d7-f14ba3a0224a</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
         <!-- Entity Framework Core com PostgreSQL -->
