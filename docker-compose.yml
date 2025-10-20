@@ -31,7 +31,7 @@ services:
       retries: 5
 
   # ===========================================
-  # TODO: AUTH.API DATABASE 
+  # TODO: AUTH.API DATABASE
   # ===========================================
   # auth-db:
   #   image: postgres:18-alpine
@@ -57,6 +57,32 @@ services:
   # BACKEND - MICROSERVIÇOS
   # ===========================================
 
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend/src
+      dockerfile: Api.Gateway/Dockerfile
+    container_name: easydonate-gateway-api
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - Services__UserApi=http://user-api:8080
+      - Services__AuthApi=http://auth-api:8080
+    ports:
+      - "${GATEWAY_API_PORT}:8080"
+    volumes:
+      - dataprotection-keys:/home/appuser/.aspnet/DataProtection-Keys
+    depends_on:
+      - user-api
+      - auth-api
+    networks:
+      - web-easydonate-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # User API
   user-api:
     build:
@@ -69,6 +95,8 @@ services:
       - ConnectionStrings__DefaultConnection=Host=user-db;Database=${USER_DB};Username=${USER_DB_USER};Password=${USER_DB_PASSWORD};Port=5432;
     ports:
       - "${USER_API_PORT}:8080"
+    volumes:
+      - dataprotection-keys:/home/appuser/.aspnet/DataProtection-Keys
     depends_on:
       user-db:
         condition: service_healthy
@@ -92,33 +120,11 @@ services:
       - ConnectionStrings__DefaultConnection=Host=auth-db;Database=${AUTH_DB};Username=${AUTH_DB_USER};Password=${AUTH_DB_PASSWORD};Port=${AUTH_DB_PORT};
     ports:
       - "${AUTH_API_PORT}:8080"
+    volumes:
+      - dataprotection-keys:/home/appuser/.aspnet/DataProtection-Keys
     # depends_on:
     #   auth-db:
     #     condition: service_healthy
-    networks:
-      - web-easydonate-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # API Gateway
-  api-gateway:
-    build:
-      context: ./backend/src
-      dockerfile: Api.Gateway/Dockerfile
-    container_name: easydonate-gateway-api
-    restart: unless-stopped
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - Services__UserApi=http://user-api:8080
-      - Services__AuthApi=http://auth-api:8080
-    ports:
-      - "${GATEWAY_API_PORT}:8080"
-    depends_on:
-      - user-api
-      - auth-api
     networks:
       - web-easydonate-network
     healthcheck:
@@ -162,4 +168,5 @@ networks:
 # ===========================================
 volumes:
   user_db_data:
+  dataprotection-keys:
   # auth_db_data:
