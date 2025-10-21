@@ -1,3 +1,9 @@
-﻿namespace Auth.Api.Dto;
+﻿using System.ComponentModel.DataAnnotations;
 
-public record LoginDto();
+namespace Auth.Api.Dto;
+
+public record LoginDto(
+    [Required] string Username,
+    [Required] string Email,
+    [Required] string Password
+);
