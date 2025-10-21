@@ -1,6 +1,10 @@
-﻿namespace Auth.Api.Services.AuthService;
+﻿using Auth.Api.Dto;
+using Auth.Api.Model;
 
-public interface IAuthService
+namespace Auth.Api.Services.AuthService
 {
-    
+    public interface IAuthService
+    {
+        public Task<ResponseModel<LoginResponseDto>> AuthenticateAsync(LoginDto dto);
+    }
 }
