@@ -15,27 +15,35 @@ public class UserApiClient(HttpClient httpClient, IOptions<ApiClientsSettings> a
         Console.WriteLine($"DEBUG: Iniciando consumo do endpoint GetUserByEmail da User.Api");
 
         var url = $"{_userApiBaseUrl}/GetUserByEmail/{email}";
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, url);
-        var response = await httpClient.SendAsync(request);
+        var response = await httpClient.GetAsync(url);
         var content = await response.Content.ReadAsStringAsync();
 
         Console.WriteLine($"DEBUG: Status: {response.StatusCode}\nDEBUG: Response: {content}");
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"API Error: {response.StatusCode} - {content}");
+            Console.WriteLine($"DEBUG: Usuário não encontrado ou erro na API");
+            return null;
         }
 
-        var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
-
-        if (responseData?.Data is null)
+        try
         {
-            throw new Exception($"Invalid response format: {content}");
-        }
+            var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
 
-        Console.WriteLine("DEBUG: Finalizando com sucesso o consumo do endpoint GetUserByEmailAsync da User.Api");
-        return responseData.Data;
+            if (responseData?.Success != true || responseData.Data == null)
+            {
+                Console.WriteLine($"DEBUG: Response inválida ou sem dados");
+                return null;
+            }
+
+            Console.WriteLine("DEBUG: Usuário encontrado com sucesso");
+            return responseData.Data;
+        }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"DEBUG: Erro ao deserializar JSON: {ex.Message}");
+            return null;
+        }
     }
 
     public async Task<UserDto?> GetUserByUsernameAsync(string username)
@@ -47,9 +55,17 @@ public class UserApiClient(HttpClient httpClient, IOptions<ApiClientsSettings> a
             return null;
 
         var content = await response.Content.ReadAsStringAsync();
-        var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
+        
+        try
+        {
+            var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
 
-        return responseData?.Success == true ? responseData.Data : null;
+            return responseData?.Success == true ? responseData.Data : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id)
@@ -61,8 +77,16 @@ public class UserApiClient(HttpClient httpClient, IOptions<ApiClientsSettings> a
             return null;
 
         var content = await response.Content.ReadAsStringAsync();
-        var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
+        
+        try
+        {
+            var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
 
-        return responseData?.Success == true ? responseData.Data : null;
+            return responseData?.Success == true ? responseData.Data : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 }
