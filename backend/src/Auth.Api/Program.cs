@@ -1,11 +1,13 @@
 using Auth.Api.Clients;
 using Auth.Api.Model;
 using Auth.Api.Services.AuthService;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
 builder.Services.Configure<ApiClientsSettings>(builder.Configuration.GetSection("ApiClients"));
@@ -24,10 +26,20 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.Title = "Auth.Api";
+        options.Theme = ScalarTheme.Default;
+        options.DefaultHttpClient =
+            new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();
