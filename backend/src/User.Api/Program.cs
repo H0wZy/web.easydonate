@@ -4,16 +4,11 @@ using Scalar.AspNetCore;
 using User.Api.Mappings;
 using User.Api.Repositories.UserRepository;
 using User.Api.Services.UserService;
-using User.Api.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.Converters.Add(new JsonDateTimeConverter());
-});
-
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
 
@@ -23,9 +18,6 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(_ => { }, typeof(UserProfile));
-
-//DateTime Converter
-builder.Services.AddSingleton<JsonDateTimeConverter>();
 
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
