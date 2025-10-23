@@ -14,19 +14,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            ValidIssuer = builder.Configuration["JWT:Issuer"],
+            ValidAudience = builder.Configuration["JWT:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"]!))
+                Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!))
         };
     });
 
 // Add authorization policies
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("authenticated", policy =>
-        policy.RequireAuthenticatedUser());
-});
+builder.Services.AddAuthorizationBuilder().AddPolicy("authenticated", policy =>
+    policy.RequireAuthenticatedUser());
 
 // Add YARP reverse proxy
 builder.Services.AddReverseProxy()
