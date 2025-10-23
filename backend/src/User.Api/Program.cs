@@ -1,3 +1,4 @@
+
 using User.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -20,7 +21,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddAutoMapper(_ => { }, typeof(UserProfile));
 
 builder.Services.AddDbContext<UserDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("UserDefaultConnection")));
 
 var app = builder.Build();
 

@@ -8,13 +8,14 @@ namespace User.Api.Services.UserService;
 
 public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
 {
-    public async Task<ResponseModel<List<UserModel>>> GetAllUsersAsync()
+    public async Task<ResponseModel<List<UserDto>?>> GetAllUsersAsync()
     {
         try
         {
             var users = await userRepository.GetAllUsersAsync();
+            var usersDto = mapper.Map<List<UserDto>>(users);
 
-            return ResponseModel<List<UserModel>>.Ok(users,
+            return ResponseModel<List<UserDto>>.Ok(usersDto,
                 users.Count == 0
                     ? "Nenhum usuário encontrado."
                     : $"{users.Count} usuário(s) encontrado(s) com sucesso.");
@@ -22,62 +23,68 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return ResponseModel<List<UserModel>>.Fail($"Erro interno: {ex.Message}.");
+            return ResponseModel<List<UserDto>>.Fail($"Erro interno: {ex.Message}.");
         }
     }
 
-    public async Task<ResponseModel<UserModel>> GetUserByIdAsync(int id)
+    public async Task<ResponseModel<UserDto?>> GetUserByIdAsync(int id)
     {
         try
         {
             var user = await userRepository.GetUserByIdAsync(id);
 
-            return user is null
-                ? ResponseModel<UserModel>.Fail($"Nenhum usuário encontrado com o ID {id}.")
-                : ResponseModel<UserModel>.Ok(user, "Usuário encontrado com sucesso.");
+            if (user is null)
+                return ResponseModel<UserDto>.Fail($"Nenhum usuário encontrado com o ID {id}.");
+
+            var userDto = mapper.Map<UserDto>(user);
+            return ResponseModel<UserDto>.Ok(userDto, "Usuário encontrado com sucesso.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}.");
+            return ResponseModel<UserDto>.Fail($"Erro interno: {ex.Message}.");
         }
     }
 
-    public async Task<ResponseModel<UserModel>> GetUserByUsernameAsync(string username)
+    public async Task<ResponseModel<UserDto?>> GetUserByUsernameAsync(string username)
     {
         try
         {
             var user = await userRepository.GetUserAsync(u => u.Username == username);
 
-            return user is null
-                ? ResponseModel<UserModel>.Fail("Usuário não encontrado.")
-                : ResponseModel<UserModel>.Ok(user, "Usuário encontrado com sucesso.");
+            if (user is null)
+                return ResponseModel<UserDto>.Fail("Usuário não encontrado.");
+
+            var userDto = mapper.Map<UserDto>(user);
+            return ResponseModel<UserDto>.Ok(userDto, "Usuário encontrado com sucesso.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}.");
+            return ResponseModel<UserDto>.Fail($"Erro interno: {ex.Message}.");
         }
     }
 
-    public async Task<ResponseModel<UserModel>> GetUserByEmailAsync(string email)
+    public async Task<ResponseModel<UserDto?>> GetUserByEmailAsync(string email)
     {
         try
         {
             var user = await userRepository.GetUserAsync(u => u.Email == email);
 
-            return user is null
-                ? ResponseModel<UserModel>.Fail("Usuário não encontrado.")
-                : ResponseModel<UserModel>.Ok(user, "Usuário encontrado com sucesso.");
+            if (user is null)
+                return ResponseModel<UserDto>.Fail("Usuário não encontrado.");
+
+            var userDto = mapper.Map<UserDto>(user);
+            return ResponseModel<UserDto>.Ok(userDto, "Usuário encontrado com sucesso.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}.");
+            return ResponseModel<UserDto>.Fail($"Erro interno: {ex.Message}.");
         }
     }
 
-    public async Task<ResponseModel<UserModel>> CreateUserAsync(CreateUserDto dto)
+    public async Task<ResponseModel<UserDto?>> CreateUserAsync(CreateUserDto dto)
     {
         try
         {
@@ -88,9 +95,9 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
             if (existingData is not null)
             {
                 if (existingData.Email == dto.Email)
-                    return ResponseModel<UserModel>.Fail("E-mail já cadastrado.");
+                    return ResponseModel<UserDto>.Fail("E-mail já cadastrado.");
                 if (existingData.Username == dto.Username)
-                    return ResponseModel<UserModel>.Fail("Nome de usuário já cadastrado.");
+                    return ResponseModel<UserDto>.Fail("Nome de usuário já cadastrado.");
             }
             
             var (hashPassword, saltPassword) = PasswordHelper.HashPassword(dto.Password);
@@ -107,16 +114,17 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
             };
 
             var createdUser = await userRepository.CreateUserAsync(user);
-            return ResponseModel<UserModel>.Ok(createdUser, "Usuário criado com sucesso.");
+            var createdUserDto = mapper.Map<UserDto>(createdUser);
+            return ResponseModel<UserDto>.Ok(createdUserDto, "Usuário criado com sucesso.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}");
+            return ResponseModel<UserDto>.Fail($"Erro interno: {ex.Message}");
         }
     }
 
-    public async Task<ResponseModel<UserModel>> UpdateUserByIdAsync(int id, UpdateUserDto dto)
+    public async Task<ResponseModel<UserDto?>> UpdateUserByIdAsync(int id, UpdateUserDto dto)
     {
         try
         {
@@ -124,11 +132,11 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
 
             if (user is null)
             {
-                return ResponseModel<UserModel>.Fail("Nenhum usuário encontrado.");
+                return ResponseModel<UserDto>.Fail("Nenhum usuário encontrado.");
             }
 
             if (dto.Username == null && dto.Email == null && dto.Firstname == null && dto.Lastname == null)
-                return ResponseModel<UserModel>.Fail("Nenhum campo alterado.");
+                return ResponseModel<UserDto>.Fail("Nenhum campo alterado.");
 
             var duplicateCheck = await userRepository.GetUserAsync(u =>
                 (u.Username == dto.Username ||
@@ -138,25 +146,26 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
             if (duplicateCheck is not null)
             {
                 if (duplicateCheck.Email == dto.Email)
-                    return ResponseModel<UserModel>.Fail("Este e-mail já está sendo utilizado.");
+                    return ResponseModel<UserDto>.Fail("Este e-mail já está sendo utilizado.");
                 if (duplicateCheck.Username == dto.Username)
-                    return ResponseModel<UserModel>.Fail("Este nome de usuário já está sendo utilizado.");
+                    return ResponseModel<UserDto>.Fail("Este nome de usuário já está sendo utilizado.");
             }
 
             mapper.Map(dto, user);
             user.UpdatedAt = DateTime.UtcNow;
             await userRepository.UpdateUserAsync(user);
 
-            return ResponseModel<UserModel>.Ok(user, "Usuário atualizado com sucesso.");
+            var updatedUserDto = mapper.Map<UserDto>(user);
+            return ResponseModel<UserDto>.Ok(updatedUserDto, "Usuário atualizado com sucesso.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return ResponseModel<UserModel>.Fail($"Erro interno: {ex.Message}");
+            return ResponseModel<UserDto>.Fail($"Erro interno: {ex.Message}");
         }
     }
 
-    public async Task<ResponseModel<UserModel>> DeleteUserByIdAsync(int id)
+    public async Task<ResponseModel<object?>> DeleteUserByIdAsync(int id)
     {
         try
         {
@@ -164,21 +173,21 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
 
             if (user is null)
             {
-                return ResponseModel<UserModel>.Fail($"Nenhum usuário encontrado com o ID {id}.");
+                return ResponseModel<object>.Fail($"Nenhum usuário encontrado com o ID {id}.");
             }
 
             await userRepository.DeleteUserAsync(user);
 
-            return ResponseModel<UserModel>.Ok(user, $"Usuário {id} deletado com sucesso.");
+            return ResponseModel<object>.Ok(null, $"Usuário {id} deletado com sucesso.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return ResponseModel<UserModel>.Fail($"Erro ao deletar: {ex.Message}");
+            return ResponseModel<object>.Fail($"Erro ao deletar: {ex.Message}");
         }
     }
 
-    public async Task<ResponseModel<UserModel>> DisableUserByIdAsync(int id)
+    public async Task<ResponseModel<UserDto?>> DisableUserByIdAsync(int id)
     {
         try
         {
@@ -186,19 +195,20 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
 
             if (user is null)
             {
-                return ResponseModel<UserModel>.Fail("Usuário não encontrado.");
+                return ResponseModel<UserDto>.Fail("Usuário não encontrado.");
             }
 
             user.IsUserDisabled = true;
             user.UpdatedAt = DateTime.UtcNow;
             await userRepository.UpdateUserAsync(user);
 
-            return ResponseModel<UserModel>.Ok(user, "Usuário desativado com sucesso.");
+            var disabledUserDto = mapper.Map<UserDto>(user);
+            return ResponseModel<UserDto>.Ok(disabledUserDto, "Usuário desativado com sucesso.");
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            return ResponseModel<UserModel>.Fail($"Erro ao desativar: {ex.Message}");
+            return ResponseModel<UserDto>.Fail($"Erro ao desativar: {ex.Message}");
         }
     }
 }

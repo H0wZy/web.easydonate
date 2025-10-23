@@ -13,6 +13,7 @@ public static class PasswordHelper
         return (hash, salt);
     }
 
+    //TODO: FAZER UPDATE DE SENHA FUTURAMENTE PARA UTILIZARMOS ESSE MÉTODO.
     public static bool VerifyPassword(string password, byte[] savedHash, byte[] savedSalt)
     {
         var verifyHash = Rfc2898DeriveBytes.Pbkdf2(password, savedSalt, 10000, HashAlgorithmName.SHA256, 32);

@@ -6,9 +6,9 @@ public record ResponseModel<T>(
     T? Data = default
 )
 {
-    public static ResponseModel<T> Ok(T data, string message = "Operação realizada com sucesso.")
+    public static ResponseModel<T?> Ok(T? data, string message = "Operação realizada com sucesso.")
         => new(true, message, data);
 
-    public static ResponseModel<T> Fail(string message)
+    public static ResponseModel<T?> Fail(string message)
         => new(false, message, default);
 }
