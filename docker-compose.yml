@@ -31,7 +31,7 @@ services:
       retries: 5
 
   # ===========================================
-  # TODO: AUTH.API DATABASE
+  # TODO: AUTH.API AINDA NÃO TEM DATABASE
   # ===========================================
   # auth-db:
   #   image: postgres:18-alpine
@@ -59,6 +59,8 @@ services:
 
   # API Gateway
   api-gateway:
+    env_file:
+      - ./.env
     build:
       context: ./backend/src
       dockerfile: Api.Gateway/Dockerfile
@@ -66,8 +68,8 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - Services__UserApi=http://user-api:8080
-      - Services__AuthApi=http://auth-api:8080
+      - Services__UserApi=${Services__UserApi}
+      - Services__AuthApi=${Services__AuthApi}
     ports:
       - "${GATEWAY_API_PORT}:8080"
     volumes:
@@ -85,6 +87,8 @@ services:
 
   # User API
   user-api:
+    env_file:
+      - ./.env
     build:
       context: ./backend/src
       dockerfile: User.Api/Dockerfile
@@ -92,7 +96,6 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=user-db;Database=${USER_DB};Username=${USER_DB_USER};Password=${USER_DB_PASSWORD};Port=5432;
     ports:
       - "${USER_API_PORT}:8080"
     volumes:
@@ -110,6 +113,8 @@ services:
 
   # Auth API
   auth-api:
+    env_file:
+      - ./.env
     build:
       context: ./backend/src
       dockerfile: Auth.Api/Dockerfile
@@ -117,7 +122,6 @@ services:
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=${AUTH_DB};Username=${AUTH_DB_USER};Password=${AUTH_DB_PASSWORD};Port=${AUTH_DB_PORT};
     ports:
       - "${AUTH_API_PORT}:8080"
     volumes:
