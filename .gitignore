@@ -274,4 +274,5 @@ CodeCoverage/
 # NUnit
 *.VisualState.xml
 TestResult.xml
-nunit-*.xmlbackend/web.easydonate.sln.DotSettings.user 
+nunit-*.xml
+backend/web.easydonate.sln.DotSettings.user
