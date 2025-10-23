@@ -4,6 +4,6 @@ namespace Auth.Api.Services.TokenService
 {
     public interface ITokenService
     {
-        string GenerateToken(UserDto user);
+        public TokenResponseDto GenerateToken(UserDto user);
     }
 }

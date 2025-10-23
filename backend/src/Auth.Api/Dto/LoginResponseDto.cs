@@ -2,7 +2,4 @@
 
 public record LoginResponseDto(
     string Token,
-    string Username,
-    string Email,
-    string Firstname,
-    string Lastname);
+    DateTime ExpiresIn);

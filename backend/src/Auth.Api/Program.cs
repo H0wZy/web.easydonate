@@ -1,6 +1,7 @@
 using Auth.Api.Clients;
 using Auth.Api.Model;
 using Auth.Api.Services.AuthService;
+using Auth.Api.Services.TokenService;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ builder.Services.AddHttpClient<UserApiClient>(client =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserApiClient, UserApiClient>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 
 var app = builder.Build();

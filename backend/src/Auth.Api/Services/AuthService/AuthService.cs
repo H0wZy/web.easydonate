@@ -1,36 +1,55 @@
 ﻿using Auth.Api.Clients;
 using Auth.Api.Dto;
 using Auth.Api.Model;
+using Auth.Api.Services.TokenService;
+using Auth.Api.Utils;
+using System;
+using System.Threading.Tasks;
 
 namespace Auth.Api.Services.AuthService
 {
-    public class AuthService(IUserApiClient userApiClient) : IAuthService
+    public class AuthService(IUserApiClient userApiClient, ITokenService tokenService) : IAuthService
     {
-        public async Task<ResponseModel<UserDto>> AuthenticateAsync(LoginDto dto)
+        public async Task<ResponseModel<TokenResponseDto>> AuthenticateAsync(LoginDto dto)
         {
             try
             {
-                Console.WriteLine($"DEBUG: Buscando usuário com email: {dto.Email}");
-                
-                var user = await userApiClient.GetUserByEmailAsync(dto.Email);
-                
-                if (user == null)
+                UserDto? user;
+
+                if (dto.Login.Contains('@'))
                 {
-                    Console.WriteLine($"DEBUG: Usuário não encontrado");
-                    return ResponseModel<UserDto>.Fail("Usuário não encontrado.");
+                    user = await userApiClient.GetUserByEmailAsync(dto.Login);
+                }
+                else
+                {
+                    user = await userApiClient.GetUserByUsernameAsync(dto.Login);
                 }
 
-                Console.WriteLine($"DEBUG: Usuário encontrado: {user.Username}");
+                if (user is null || user.IsUserDisabled)
+                {
+                    return ResponseModel<TokenResponseDto>.Fail("Credenciais inválidas.");
+                }
+
+                var savedHash = Convert.FromBase64String(user.HashPassword);
+                var savedSalt = Convert.FromBase64String(user.SaltPassword);
+
+                var isPasswordValid = PasswordHelper.VerifyPassword(dto.Password, savedHash, savedSalt);
+
+                if (!isPasswordValid)
+                {
+                    return ResponseModel<TokenResponseDto>.Fail("Credenciais inválidas.");
+                }
+
+                var tokenResponse = tokenService.GenerateToken(user);
                 
-                // TODO: Aqui você vai implementar a validação de senha
-                // var isPasswordValid = VerifyPassword(dto.Password, user.HashPassword, user.SaltPassword);
+                //TODO: PEDIR AO USER.API ATUALIZAR LastLoginAt.
                 
-                return ResponseModel<UserDto>.Ok(user, "Usuário autenticado com sucesso.");
+                return ResponseModel<TokenResponseDto>.Ok(tokenResponse, "Usuário autenticado com sucesso.");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"DEBUG: Erro na autenticação: {ex.Message}");
-                return ResponseModel<UserDto>.Fail($"Erro interno: {ex.Message}");
+                return ResponseModel<TokenResponseDto>.Fail($"Erro interno: {ex.Message}");
             }
         }
     }

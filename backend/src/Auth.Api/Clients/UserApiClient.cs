@@ -12,7 +12,7 @@ public class UserApiClient(HttpClient httpClient, IOptions<ApiClientsSettings> a
 
     public async Task<UserDto?> GetUserByEmailAsync(string email)
     {
-        Console.WriteLine($"DEBUG: Iniciando consumo do endpoint GetUserByEmail da User.Api");
+        Console.WriteLine("DEBUG: Iniciando consumo do endpoint GetUserByEmail da User.Api");
 
         var url = $"{_userApiBaseUrl}/GetUserByEmail/{email}";
         var response = await httpClient.GetAsync(url);
@@ -22,7 +22,7 @@ public class UserApiClient(HttpClient httpClient, IOptions<ApiClientsSettings> a
 
         if (!response.IsSuccessStatusCode)
         {
-            Console.WriteLine($"DEBUG: Usuário não encontrado ou erro na API");
+            Console.WriteLine("DEBUG: Usuário não encontrado ou erro na API");
             return null;
         }
 
@@ -32,7 +32,7 @@ public class UserApiClient(HttpClient httpClient, IOptions<ApiClientsSettings> a
 
             if (responseData?.Success != true || responseData.Data == null)
             {
-                Console.WriteLine($"DEBUG: Response inválida ou sem dados");
+                Console.WriteLine("DEBUG: Response inválida ou sem dados");
                 return null;
             }
 
