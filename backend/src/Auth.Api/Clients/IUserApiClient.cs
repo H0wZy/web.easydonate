@@ -6,5 +6,5 @@ public interface IUserApiClient
 {
     Task<UserDto?> GetUserByEmailAsync(string email);
     Task<UserDto?> GetUserByUsernameAsync(string username);
-    Task<UserDto?> GetUserByIdAsync(int id);
+    Task<UserDto?> UpdateLastLoginAsync(int id);
 }

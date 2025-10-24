@@ -51,6 +51,13 @@ namespace User.Api.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
+        [HttpPatch("UpdateLastLogin/{id:int}")]
+        public async Task<ActionResult<ResponseModel<UserDto>>> UpdateLastLogin(int id)
+        {
+            var response = await userService.UpdateLastLoginAsync(id);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
         [HttpDelete("DeleteUserById/{id:int}")]
         public async Task<ActionResult<ResponseModel<object>>> DeleteUserById(int id)
         {
