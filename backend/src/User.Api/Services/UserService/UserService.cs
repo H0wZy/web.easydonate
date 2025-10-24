@@ -99,7 +99,7 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
                 if (existingData.Username == dto.Username)
                     return ResponseModel<UserDto>.Fail("Nome de usuário já cadastrado.");
             }
-            
+
             var (hashPassword, saltPassword) = PasswordHelper.HashPassword(dto.Password);
 
             var user = new UserModel
@@ -162,6 +162,28 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
         {
             Console.WriteLine(ex);
             return ResponseModel<UserDto>.Fail($"Erro interno: {ex.Message}");
+        }
+    }
+
+    public async Task<ResponseModel<UserDto?>> UpdateLastLoginAsync(int id)
+    {
+        try
+        {
+            var user = await userRepository.GetUserByIdAsync(id);
+
+            if (user is null)
+                return ResponseModel<UserDto?>.Fail("Usuário não encontrado.");
+
+            user.LastLoginAt = DateTime.UtcNow;
+            await userRepository.UpdateUserAsync(user);
+            
+            var userDto = mapper.Map<UserDto>(user);
+            return ResponseModel<UserDto>.Ok(userDto, "Data de último login atualizada com sucesso.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return ResponseModel<UserDto>.Fail($"Erro ao atualizar data de último login: {ex.Message}");
         }
     }
 

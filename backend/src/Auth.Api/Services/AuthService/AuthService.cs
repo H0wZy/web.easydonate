@@ -3,8 +3,6 @@ using Auth.Api.Dto;
 using Auth.Api.Model;
 using Auth.Api.Services.TokenService;
 using Auth.Api.Utils;
-using System;
-using System.Threading.Tasks;
 
 namespace Auth.Api.Services.AuthService
 {
@@ -15,14 +13,17 @@ namespace Auth.Api.Services.AuthService
             try
             {
                 UserDto? user;
+                string loginMethod;
 
                 if (dto.Login.Contains('@'))
                 {
                     user = await userApiClient.GetUserByEmailAsync(dto.Login);
+                    loginMethod = "email";
                 }
                 else
                 {
                     user = await userApiClient.GetUserByUsernameAsync(dto.Login);
+                    loginMethod = "username";
                 }
 
                 if (user is null || user.IsUserDisabled)
@@ -39,10 +40,15 @@ namespace Auth.Api.Services.AuthService
                 {
                     return ResponseModel<TokenResponseDto>.Fail("Credenciais inválidas.");
                 }
-
-                var tokenResponse = tokenService.GenerateToken(user);
                 
-                //TODO: PEDIR AO USER.API ATUALIZAR LastLoginAt.
+                var tokenResponse = tokenService.GenerateToken(user);
+                var updatedUser = await userApiClient.UpdateLastLoginAsync(user.Id);
+
+                tokenResponse = tokenResponse with
+                {
+                    LastLoginAt = updatedUser?.LastLoginAt,
+                    LoginMethod = loginMethod
+                };
                 
                 return ResponseModel<TokenResponseDto>.Ok(tokenResponse, "Usuário autenticado com sucesso.");
             }

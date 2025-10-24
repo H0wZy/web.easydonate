@@ -55,7 +55,7 @@ public class UserApiClient(HttpClient httpClient, IOptions<ApiClientsSettings> a
             return null;
 
         var content = await response.Content.ReadAsStringAsync();
-        
+
         try
         {
             var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
@@ -77,11 +77,32 @@ public class UserApiClient(HttpClient httpClient, IOptions<ApiClientsSettings> a
             return null;
 
         var content = await response.Content.ReadAsStringAsync();
-        
+
         try
         {
             var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
 
+            return responseData?.Success == true ? responseData.Data : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    public async Task<UserDto?> UpdateLastLoginAsync(int id)
+    {
+        var url = $"{_userApiBaseUrl}/UpdateLastLogin/{id}";
+        var response = await httpClient.PatchAsync(url, null);
+
+        if (!response.IsSuccessStatusCode)
+            return null;
+
+        var content = await response.Content.ReadAsStringAsync();
+        
+        try
+        {
+            var responseData = JsonConvert.DeserializeObject<ResponseModel<UserDto>>(content);
             return responseData?.Success == true ? responseData.Data : null;
         }
         catch (JsonException)

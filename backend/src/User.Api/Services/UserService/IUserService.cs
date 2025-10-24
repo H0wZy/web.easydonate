@@ -11,6 +11,7 @@ public interface IUserService
     public Task<ResponseModel<UserDto?>> GetUserByEmailAsync(string email);
     public Task<ResponseModel<UserDto?>> CreateUserAsync(CreateUserDto dto);
     public Task<ResponseModel<UserDto?>> UpdateUserByIdAsync(int id, UpdateUserDto dto);
+    public Task<ResponseModel<UserDto?>> UpdateLastLoginAsync(int id);
     public Task<ResponseModel<object?>> DeleteUserByIdAsync(int id);
     public Task<ResponseModel<UserDto?>> DisableUserByIdAsync(int id);
 }
