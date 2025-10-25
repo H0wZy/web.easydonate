@@ -42,8 +42,12 @@ up: ## Sobe todos os containers
 	@echo "  Auth API:    http://localhost:${AUTH_API_PORT}"
 	@echo "  PostgreSQL:  localhost:${USER_DB_PORT}"
 
-down: ## Para todos os containers
+stop: ## Para todos os containers
 	@echo "$(YELLOW)Parando containers...$(NC)"
+	docker compose stop
+
+down: ## Para todos os containers
+	@echo "$(YELLOW)Derrubando containers...$(NC)"
 	docker compose down
 
 restart: down up ## Reinicia todos os containers
