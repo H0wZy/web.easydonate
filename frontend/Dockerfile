@@ -1,4 +1,19 @@
 # =====================================
+# Estágio Development
+# =====================================
+FROM node:22 AS development
+
+WORKDIR /app
+
+# Copiar package files e instalar dependências
+COPY package*.json ./
+RUN npm install
+
+# Comando padrão para iniciar o servidor de desenvolvimento
+CMD ["npm", "run", "dev"]
+
+
+# =====================================
 # Estágio 1: Build
 # =====================================
 FROM node:22 AS build
