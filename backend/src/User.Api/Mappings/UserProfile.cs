@@ -16,6 +16,7 @@ public class UserProfile : Profile
         CreateMap<UserModel, UserDto>()
             .ForMember(dest => dest.HashPassword, opt => opt.MapFrom(src => Convert.ToBase64String(src.HashPassword)))
             .ForMember(dest => dest.SaltPassword, opt => opt.MapFrom(src => Convert.ToBase64String(src.SaltPassword)))
+            .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt))
             .ForMember(dest => dest.UserType, opt => opt.MapFrom(src => (int)src.UserType));
     }
 }

@@ -165,6 +165,45 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
         }
     }
 
+    public async Task<ResponseModel<UserDto?>> UpdateUserPasswordByIdAsync(int id, UpdatePasswordDto dto)
+    {
+        try
+        {
+            var user = await userRepository.GetUserByIdAsync(id);
+
+            if (user is null)
+                return ResponseModel<UserDto?>.Fail("Usuário não encontrado.");
+
+            var isCurrentPasswordValid =
+                PasswordHelper.VerifyPassword(dto.CurrentPassword, user.HashPassword, user.SaltPassword);
+
+            if (!isCurrentPasswordValid)
+            {
+                return ResponseModel<UserDto?>.Fail("Senha atual inválida.");
+            }
+
+            var isCurrentPasswordSameAsNewPassword = isCurrentPasswordValid && dto.CurrentPassword == dto.NewPassword;
+            if (isCurrentPasswordSameAsNewPassword)
+                return ResponseModel<UserDto?>.Fail("A nova senha não pode ser igual à senha atual.");
+
+            var (newHash, newSalt) = PasswordHelper.HashPassword(dto.NewPassword);
+
+            user.HashPassword = newHash;
+            user.SaltPassword = newSalt;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await userRepository.UpdateUserAsync(user);
+
+            var userDto = mapper.Map<UserDto>(user);
+            return ResponseModel<UserDto?>.Ok(userDto, "Senha atualizada com sucesso.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return ResponseModel<UserDto?>.Fail($"Erro ao atualizar senha: {ex.Message}");
+        }
+    }
+
     public async Task<ResponseModel<UserDto?>> UpdateLastLoginAsync(int id)
     {
         try
@@ -176,7 +215,7 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
 
             user.LastLoginAt = DateTime.UtcNow;
             await userRepository.UpdateUserAsync(user);
-            
+
             var userDto = mapper.Map<UserDto>(user);
             return ResponseModel<UserDto>.Ok(userDto, "Data de último login atualizada com sucesso.");
         }
@@ -224,8 +263,8 @@ public class UserService(IUserRepository userRepository, IMapper mapper) : IUser
             user.UpdatedAt = DateTime.UtcNow;
             await userRepository.UpdateUserAsync(user);
 
-            var disabledUserDto = mapper.Map<UserDto>(user);
-            return ResponseModel<UserDto>.Ok(disabledUserDto, "Usuário desativado com sucesso.");
+            var userDto = mapper.Map<UserDto>(user);
+            return ResponseModel<UserDto>.Ok(userDto, "Usuário desativado com sucesso.");
         }
         catch (Exception ex)
         {

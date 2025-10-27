@@ -51,6 +51,13 @@ namespace User.Api.Controllers
             return response.Success ? Ok(response) : BadRequest(response);
         }
 
+        [HttpPatch("UpdateUserPasswordById/{id:int}")]
+        public async Task<ActionResult<ResponseModel<UserModel>>> UpdateUserPasswordByIdAsync(int id, [FromBody] UpdatePasswordDto dto)
+        {
+            var response = await userService.UpdateUserPasswordByIdAsync(id, dto);
+            return response.Success ? Ok(response) : BadRequest(response);
+        }
+
         [HttpPatch("UpdateLastLogin/{id:int}")]
         public async Task<ActionResult<ResponseModel<UserDto>>> UpdateLastLogin(int id)
         {
