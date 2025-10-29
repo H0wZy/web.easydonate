@@ -4,5 +4,5 @@ namespace Auth.Api.Dto;
 
 public record LoginDto(
     [Required] string Login,
-    [Required] string Password
+    [Required] string Password //ok
 );
