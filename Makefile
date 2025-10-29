@@ -38,8 +38,8 @@ up: ## Sobe todos os containers
 	@echo "$(GREEN)Containers iniciados! Acesse:$(NC)"
 	@echo "  Frontend:    http://localhost:${FRONTEND_PORT}"
 	@echo "  Gateway:     http://localhost:${GATEWAY_API_PORT}"
-	@echo "  User API:    http://localhost:${USER_API_PORT}"
-	@echo "  Auth API:    http://localhost:${AUTH_API_PORT}"
+	@echo "  User API:    http://localhost:${USER_API_PORT}/scalar"
+	@echo "  Auth API:    http://localhost:${AUTH_API_PORT}/scalar"
 	@echo "  PostgreSQL:  localhost:${USER_DB_PORT}"
 
 stop: ## Para todos os containers
