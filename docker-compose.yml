@@ -150,7 +150,7 @@ services:
     ports:
       - "${FRONTEND_PORT}:5173" # Vite's default port
     volumes:
-      - ./frontend:/app:Z # Map source code
+      - ./frontend:/app:Z # Map source code || Use :Z for SELinux systems
       - /app/node_modules # Preserve node_modules
     networks:
       - web-easydonate-network
