@@ -15,7 +15,7 @@ export
 
 help: ## Mostra esta mensagem de ajuda
 	@echo "$(GREEN)Comandos disponíveis:$(NC)"
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-20s$(NC) %s\n", $$1, $$2}'
+	@grep -E -h '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-20s$(NC) %s\n", $$1, $$2}'
 	@echo ""
 	@echo "$(BLUE)Comandos com serviços específicos:$(NC)"
 	@echo "  $(YELLOW)rebuild-service$(NC)  SERVICE=nome  - Rebuild de um serviço específico"
