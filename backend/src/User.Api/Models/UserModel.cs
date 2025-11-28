@@ -25,9 +25,9 @@ public class UserModel
 
     [Column("Fullname")] public string Fullname => $"{Firstname} {Lastname}";
 
-    [Column("HashPassword")] public byte[] HashPassword { get; set; } = System.Array.Empty<byte>();
+    [Column("HashPassword")] public byte[] HashPassword { get; set; } = [];
 
-    [Column("SaltPassword")] public byte[] SaltPassword { get; set; } = System.Array.Empty<byte>();
+    [Column("SaltPassword")] public byte[] SaltPassword { get; set; } = [];
 
     [Column("UserType")] public required UserType UserType { get; set; } // "Doador", "Ong", "ADM"
 
