@@ -5,9 +5,9 @@ namespace User.Api.Data;
 
 public class UserDbContext(DbContextOptions<UserDbContext> options) : DbContext(options)
 {
-    public DbSet<UserModel> Users { get; set; }
-    public DbSet<DonorModel> Donors { get; set; }
-    public DbSet<OrganizationModel> Organizations { get; set; }
+    public DbSet<UserModel> Users { get; set; } = null!;
+    public DbSet<DonorModel> Donors { get; set; } = null!;
+    public DbSet<OrganizationModel> Organizations { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

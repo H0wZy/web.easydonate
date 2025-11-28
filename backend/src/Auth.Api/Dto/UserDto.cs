@@ -3,10 +3,10 @@
 public class UserDto
 {
     public int Id { get; set; }
-    public string Username { get; set; }
-    public string Email { get; set; }
-    public string HashPassword { get; set; }
-    public string SaltPassword { get; set; }
+    public string Username { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string HashPassword { get; set; } = string.Empty;
+    public string SaltPassword { get; set; } = string.Empty;
     public int UserType { get; set; }
     public bool IsUserDisabled { get; set; }
     public DateTime? UpdatedAt { get; set; }
